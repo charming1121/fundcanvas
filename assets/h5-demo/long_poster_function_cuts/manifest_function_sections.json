@@ -1,0 +1,157 @@
+{
+  "source_image": "/mnt/data/image(93).png",
+  "source_size": {
+    "width": 185,
+    "height": 2048
+  },
+  "cutting_mode": "functional_sections_simple",
+  "note": "源文件为扁平PNG，无法恢复PSD真实图层；本结果按功能区一段一段切分。",
+  "sections": [
+    {
+      "id": "01",
+      "name": "头图主视觉_标题A股中坚力量与三大卖点",
+      "description": "顶部头图：品牌氛围、主标题、A字主视觉、三大核心卖点",
+      "bbox": {
+        "x1": 0,
+        "y1": 0,
+        "x2": 185,
+        "y2": 270
+      },
+      "size": {
+        "width": 185,
+        "height": 270
+      },
+      "file_original_size": "original_size/01_头图主视觉_标题A股中坚力量与三大卖点.png",
+      "file_upscaled_x4": "upscaled_x4/01_头图主视觉_标题A股中坚力量与三大卖点.png"
+    },
+    {
+      "id": "02",
+      "name": "卖点区1_中证500高弹性高波动特征",
+      "description": "第一张红色信息卡：中证500高弹性标题、正文解释、收益曲线图、涨幅对比表与数据说明",
+      "bbox": {
+        "x1": 0,
+        "y1": 270,
+        "x2": 185,
+        "y2": 715
+      },
+      "size": {
+        "width": 185,
+        "height": 445
+      },
+      "file_original_size": "original_size/02_卖点区1_中证500高弹性高波动特征.png",
+      "file_upscaled_x4": "upscaled_x4/02_卖点区1_中证500高弹性高波动特征.png"
+    },
+    {
+      "id": "03",
+      "name": "卖点区2_广发量化投资实力与行业覆盖",
+      "description": "第二张红色信息卡：广发量化实力、行业覆盖文字、行业分布图、风险收益能力指标",
+      "bbox": {
+        "x1": 0,
+        "y1": 715,
+        "x2": 185,
+        "y2": 1132
+      },
+      "size": {
+        "width": 185,
+        "height": 417
+      },
+      "file_original_size": "original_size/03_卖点区2_广发量化投资实力与行业覆盖.png",
+      "file_upscaled_x4": "upscaled_x4/03_卖点区2_广发量化投资实力与行业覆盖.png"
+    },
+    {
+      "id": "04",
+      "name": "卖点区3_主动量AI增强策略逻辑",
+      "description": "第三张红色信息卡：主动量+AI增强、指数增强基金与高收益基金的对比/机制说明、如何选择",
+      "bbox": {
+        "x1": 0,
+        "y1": 1132,
+        "x2": 185,
+        "y2": 1525
+      },
+      "size": {
+        "width": 185,
+        "height": 393
+      },
+      "file_original_size": "original_size/04_卖点区3_主动量AI增强策略逻辑.png",
+      "file_upscaled_x4": "upscaled_x4/04_卖点区3_主动量AI增强策略逻辑.png"
+    },
+    {
+      "id": "05",
+      "name": "卖点区4_大平台护航与投资者选择",
+      "description": "第四张红色信息卡上半段：大平台护航标题、持有人数据、白话说明与数据来源",
+      "bbox": {
+        "x1": 0,
+        "y1": 1525,
+        "x2": 185,
+        "y2": 1695
+      },
+      "size": {
+        "width": 185,
+        "height": 170
+      },
+      "file_original_size": "original_size/05_卖点区4_大平台护航与投资者选择.png",
+      "file_upscaled_x4": "upscaled_x4/05_卖点区4_大平台护航与投资者选择.png"
+    },
+    {
+      "id": "06",
+      "name": "基金经理区_管理力量介绍",
+      "description": "基金经理/管理团队功能区：了解基金背后的管理力量、经理头像与要点说明",
+      "bbox": {
+        "x1": 0,
+        "y1": 1695,
+        "x2": 185,
+        "y2": 1840
+      },
+      "size": {
+        "width": 185,
+        "height": 145
+      },
+      "file_original_size": "original_size/06_基金经理区_管理力量介绍.png",
+      "file_upscaled_x4": "upscaled_x4/06_基金经理区_管理力量介绍.png"
+    },
+    {
+      "id": "07",
+      "name": "指数信息表_标的指数与产品信息",
+      "description": "底部指数/产品信息表格区",
+      "bbox": {
+        "x1": 0,
+        "y1": 1840,
+        "x2": 185,
+        "y2": 1938
+      },
+      "size": {
+        "width": 185,
+        "height": 98
+      },
+      "file_original_size": "original_size/07_指数信息表_标的指数与产品信息.png",
+      "file_upscaled_x4": "upscaled_x4/07_指数信息表_标的指数与产品信息.png"
+    },
+    {
+      "id": "08",
+      "name": "风险提示_完整免责声明",
+      "description": "底部风险提示和免责声明长文区",
+      "bbox": {
+        "x1": 0,
+        "y1": 1938,
+        "x2": 185,
+        "y2": 2048
+      },
+      "size": {
+        "width": 185,
+        "height": 110
+      },
+      "file_original_size": "original_size/08_风险提示_完整免责声明.png",
+      "file_upscaled_x4": "upscaled_x4/08_风险提示_完整免责声明.png"
+    }
+  ],
+  "backgrounds": [
+    {
+      "file": "backgrounds/background_plain_estimate.png",
+      "note": "估算纯背景，非真实可编辑背景"
+    },
+    {
+      "file": "backgrounds/background_blurred_layout_reference.png",
+      "note": "保留版式色块的模糊背景参考，非真实背景"
+    }
+  ]
+}
