@@ -8386,16 +8386,27 @@ async function fetchImageAsBlobUrl(url) {
   if (!raw) return raw;
   // data: 或 blob: 直接返回，无需 fetch
   if (/^(data:|blob:)/i.test(raw)) return raw;
+  // 尝试 1：直接 CORS fetch
   try {
     const resp = await fetch(raw, { mode: 'cors', credentials: 'omit' });
     if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
     const blob = await resp.blob();
     return URL.createObjectURL(blob);
   } catch (e) {
-    // CORS fetch 失败时降级：直接返回原 URL（canvas 会被 taint，但至少图片能显示）
-    console.warn('[fetchImageAsBlobUrl] fetch 失败，降级直接使用原 URL', e.message, raw);
-    return raw;
+    console.warn('[fetchImageAsBlobUrl] 直接 CORS 失败，尝试代理', e.message);
   }
+  // 尝试 2：CORS 代理
+  try {
+    const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(raw);
+    const resp = await fetch(proxyUrl, { credentials: 'omit' });
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    const blob = await resp.blob();
+    return URL.createObjectURL(blob);
+  } catch (e) {
+    console.warn('[fetchImageAsBlobUrl] 代理也失败，跳过图片绘制（避免污染 canvas）', e.message);
+  }
+  // 返回空串：调用方应跳过绘制，不污染 canvas，保证 toDataURL 可用
+  return '';
 }
 
 async function composeAI(imageUrl, w, h, options) {
@@ -8418,12 +8429,16 @@ async function composeAI(imageUrl, w, h, options) {
   const ctx = mc.getContext('2d');
   // 通过 fetch blob 方式绕开 file:// origin 下的 CORS 限制
   const blobUrl = await fetchImageAsBlobUrl(imageUrl);
-  await new Promise(resolve => {
-    const img = new Image();
-    img.onload = () => { ctx.drawImage(img, 0, 0, w, h); URL.revokeObjectURL(blobUrl); resolve(); };
-    img.onerror = () => { URL.revokeObjectURL(blobUrl); _drawDemoBg(mc); resolve(); };
-    img.src = blobUrl;
-  });
+  if (blobUrl) {
+    await new Promise(resolve => {
+      const img = new Image();
+      img.onload = () => { ctx.drawImage(img, 0, 0, w, h); if (blobUrl.startsWith('blob:')) URL.revokeObjectURL(blobUrl); resolve(); };
+      img.onerror = () => { if (blobUrl.startsWith('blob:')) URL.revokeObjectURL(blobUrl); _drawDemoBg(mc); resolve(); };
+      img.src = blobUrl;
+    });
+  } else {
+    _drawDemoBg(mc);
+  }
 
   if (!options.preserveDesignLayers) {
     dlLayers.length = 0;
