@@ -3140,6 +3140,8 @@ function setCanvasPreviewMode(mode) {
   }
   if (refImg) refImg.style.display = 'none';
   if (moduleStage) moduleStage.style.display = 'none';
+  const aiOverlay = document.getElementById('ai-result-overlay');
+  if (aiOverlay) aiOverlay.style.display = state.hasImage ? 'none' : 'block';
   renderReferenceSegmentationOverlay();
   if (!state.hasImage) {
     if (empty) empty.style.display = 'flex';
@@ -8384,29 +8386,26 @@ async function callImgEditAPI(prompt, imageBlob, maskBlob) {
 async function fetchImageAsBlobUrl(url) {
   const raw = String(url || '').trim();
   if (!raw) return raw;
-  // data: 或 blob: 直接返回，无需 fetch
   if (/^(data:|blob:)/i.test(raw)) return raw;
-  // 尝试 1：直接 CORS fetch
-  try {
-    const resp = await fetch(raw, { mode: 'cors', credentials: 'omit' });
-    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-    const blob = await resp.blob();
-    return URL.createObjectURL(blob);
-  } catch (e) {
-    console.warn('[fetchImageAsBlobUrl] 直接 CORS 失败，尝试代理', e.message);
+  const attempts = [
+    () => fetch(raw, { mode: 'cors', credentials: 'omit' }),
+    () => fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent(raw), { credentials: 'omit' }),
+    () => fetch('https://images.weserv.nl/?url=' + encodeURIComponent(raw), { credentials: 'omit' }),
+    () => fetch('https://corsproxy.io/?' + encodeURIComponent(raw), { credentials: 'omit' }),
+  ];
+  for (let i = 0; i < attempts.length; i++) {
+    try {
+      const resp = await attempts[i]();
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      const blob = await resp.blob();
+      return URL.createObjectURL(blob);
+    } catch (e) {
+      console.warn(`[fetchImageAsBlobUrl] 尝试${i + 1}失败`, e.message);
+    }
   }
-  // 尝试 2：CORS 代理
-  try {
-    const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(raw);
-    const resp = await fetch(proxyUrl, { credentials: 'omit' });
-    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-    const blob = await resp.blob();
-    return URL.createObjectURL(blob);
-  } catch (e) {
-    console.warn('[fetchImageAsBlobUrl] 代理也失败，跳过图片绘制（避免污染 canvas）', e.message);
-  }
-  // 返回空串：调用方应跳过绘制，不污染 canvas，保证 toDataURL 可用
-  return '';
+  // 所有代理均失败：返回特殊标记，由调用方降级处理
+  console.warn('[fetchImageAsBlobUrl] 所有方式均失败，降级展示', raw);
+  return '__fallback__:' + raw;
 }
 
 async function composeAI(imageUrl, w, h, options) {
@@ -8429,13 +8428,29 @@ async function composeAI(imageUrl, w, h, options) {
   const ctx = mc.getContext('2d');
   // 通过 fetch blob 方式绕开 file:// origin 下的 CORS 限制
   const blobUrl = await fetchImageAsBlobUrl(imageUrl);
-  if (blobUrl) {
+  if (blobUrl && !blobUrl.startsWith('__fallback__:')) {
     await new Promise(resolve => {
       const img = new Image();
       img.onload = () => { ctx.drawImage(img, 0, 0, w, h); if (blobUrl.startsWith('blob:')) URL.revokeObjectURL(blobUrl); resolve(); };
       img.onerror = () => { if (blobUrl.startsWith('blob:')) URL.revokeObjectURL(blobUrl); _drawDemoBg(mc); resolve(); };
       img.src = blobUrl;
     });
+  } else if (blobUrl && blobUrl.startsWith('__fallback__:')) {
+    // CORS 完全无法绕过：用 <img> 覆盖显示，让用户能看到结果（canvas 不可导出）
+    const originalUrl = blobUrl.slice('__fallback__:'.length);
+    _drawDemoBg(mc);
+    let overlay = document.getElementById('ai-result-overlay');
+    if (!overlay) {
+      overlay = document.createElement('img');
+      overlay.id = 'ai-result-overlay';
+      overlay.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;object-fit:contain;pointer-events:none;z-index:5;';
+      document.getElementById('canvas-area').style.position = 'relative';
+      document.getElementById('canvas-area').appendChild(overlay);
+    }
+    overlay.src = originalUrl;
+    overlay.style.display = 'block';
+    // 显示提示
+    showToast('图片已生成，因 CDN 跨域限制无法写入画布，已覆盖显示。右键图片可另存为。', true);
   } else {
     _drawDemoBg(mc);
   }
