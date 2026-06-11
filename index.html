@@ -20,7 +20,7 @@
   --radius: 10px;
   --shadow: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
   --shadow-md: 0 4px 16px rgba(0,0,0,.10);
-  --sidebar-w: 188px;
+  --sidebar-w: 320px;
   --right-w: 420px;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -69,9 +69,9 @@ body{font-family:'PingFang SC','Hiragino Sans GB',system-ui,sans-serif;backgroun
 .new-proj-opt-icon{font-size:18px;flex-shrink:0;}
 .new-proj-opt-title{font-size:13px;font-weight:600;color:var(--text);line-height:1.3;}
 .new-proj-opt-desc{font-size:11.5px;color:var(--text-sub);}
-.sidebar-nav{flex:1;overflow-y:auto;min-height:0;}
-.sidebar-chat{border-top:1px solid var(--border);padding:10px 10px 12px;flex-shrink:0;}
-.sidebar-chat-label{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;font-weight:600;margin-bottom:8px;padding:0 2px;display:flex;align-items:center;gap:5px;}
+.sidebar-nav{flex:0 0 auto;max-height:220px;overflow-y:auto;min-height:0;}
+.sidebar-chat{flex:1;min-height:0;display:flex;flex-direction:column;border-top:1px solid var(--border);background:linear-gradient(180deg,#fff 0%,#F8FAFC 100%);}
+.sidebar-chat-label{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;font-weight:600;padding:12px 12px 8px;display:flex;align-items:center;gap:5px;flex-shrink:0;}
 .proj-thumb{width:22px;height:16px;border-radius:3px;background:linear-gradient(135deg,#2563EB40,#7C3AED40);flex-shrink:0;}
 
 /* Pages */
@@ -152,6 +152,8 @@ body{font-family:'PingFang SC','Hiragino Sans GB',system-ui,sans-serif;backgroun
 .gen-text{font-size:14px;color:var(--text-sub);font-weight:500;}
 .gen-bar-wrap{width:200px;height:4px;background:var(--border);border-radius:4px;overflow:hidden;}
 .gen-bar{height:100%;background:linear-gradient(90deg,var(--brand),#7C3AED);border-radius:4px;width:0;transition:width .3s;}
+.cors-fallback-action{position:absolute;right:12px;bottom:12px;z-index:12;display:none;align-items:center;gap:8px;padding:8px 10px;border-radius:10px;border:1px solid #FECACA;background:rgba(255,255,255,.95);box-shadow:0 8px 20px rgba(15,23,42,.14);}
+.cors-fallback-note{font-size:11.5px;color:#7F1D1D;white-space:nowrap;}
 
 /* History strip — bottom tray */
 .history-strip{height:92px;background:#fff;border-top:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden;}
@@ -255,11 +257,11 @@ body{font-family:'PingFang SC','Hiragino Sans GB',system-ui,sans-serif;backgroun
 /* Chat bar */
 .chat-bar{background:#fff;border-top:1px solid var(--border);padding:8px 16px 12px;flex-shrink:0;}
 .chat-suggestions{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;}
-.chat-chip{padding:4px 11px;border-radius:16px;border:1px solid var(--border);background:#fff;color:var(--text-sub);font-size:12px;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.chat-chip{padding:6px 10px;border-radius:12px;border:1px solid var(--border);background:#fff;color:var(--text-sub);font-size:12px;cursor:pointer;transition:all .15s;white-space:normal;line-height:1.45;text-align:left;}
 .chat-chip:hover{border-color:var(--brand);color:var(--brand);background:var(--brand-light);}
-.chat-input-row{display:flex;align-items:center;gap:8px;background:var(--bg);border:1.5px solid var(--border);border-radius:24px;padding:7px 7px 7px 16px;transition:border-color .15s;}
+.chat-input-row{display:flex;align-items:flex-end;gap:8px;background:var(--bg);border:1.5px solid var(--border);border-radius:18px;padding:10px 10px 10px 14px;transition:border-color .15s;}
 .chat-input-row:focus-within{border-color:var(--brand);}
-.chat-input-row input{flex:1;border:none;background:none;outline:none;font-size:13.5px;color:var(--text);}
+.chat-input-row input{flex:1;border:none;background:none;outline:none;font-size:13px;color:var(--text);min-width:0;line-height:1.5;}
 .chat-input-row input::placeholder{color:var(--text-muted);}
 .chat-send-btn{width:34px;height:34px;border-radius:50%;background:var(--brand);border:none;color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s;}
 .chat-send-btn:hover{background:var(--brand-hover);}
@@ -272,7 +274,7 @@ body{font-family:'PingFang SC','Hiragino Sans GB',system-ui,sans-serif;backgroun
 .msg-avatar{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
 .chat-msg.user .msg-avatar{background:var(--brand);color:#fff;}
 .chat-msg.ai .msg-avatar{background:linear-gradient(135deg,#7C3AED,#2563EB);color:#fff;}
-.msg-bubble{max-width:78%;padding:7px 11px;border-radius:12px;font-size:12.5px;line-height:1.5;}
+.msg-bubble{max-width:78%;padding:9px 11px;border-radius:12px;font-size:12.5px;line-height:1.6;word-break:break-word;white-space:pre-wrap;}
 .chat-msg.user .msg-bubble{background:var(--brand);color:#fff;border-bottom-right-radius:3px;}
 .chat-msg.ai .msg-bubble{background:var(--bg);color:var(--text);border-bottom-left-radius:3px;border:1px solid var(--border);}
 .assistant-guide{display:grid;gap:10px;min-width:250px;}
@@ -325,7 +327,21 @@ body.right-resizing .right-panel,body.right-resizing .right-collapse-btn{transit
 /* Param cards */
 .param-card{background:var(--bg);border-radius:10px;padding:12px;margin-bottom:10px;}
 .param-card.ai-sync{background:#F8FBFF;border:1px solid #D9EAFE;}
-.param-card-title{font-size:12px;font-weight:600;color:var(--text-sub);margin-bottom:10px;text-transform:uppercase;letter-spacing:.04em;}
+.param-card-title{font-size:12px;font-weight:600;color:var(--text-sub);margin-bottom:10px;text-transform:none;letter-spacing:.02em;}
+.framework-summary{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;}
+.framework-pill{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:#F8FAFC;border:1px solid var(--border);font-size:11.5px;color:var(--text-sub);}
+.framework-pill b{color:var(--text);font-weight:700;}
+.framework-sections{display:grid;gap:10px;}
+.framework-section{border:1px solid var(--border);border-radius:12px;background:#fff;overflow:hidden;}
+.framework-section summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;cursor:pointer;background:#F8FAFC;}
+.framework-section summary::-webkit-details-marker{display:none;}
+.framework-section[open] summary{background:#EFF6FF;}
+.framework-section-title{display:grid;gap:2px;min-width:0;}
+.framework-section-name{font-size:12.5px;font-weight:700;color:var(--text);}
+.framework-section-meta{font-size:11px;color:var(--text-muted);line-height:1.5;}
+.framework-section-arrow{font-size:12px;color:var(--text-sub);transition:transform .16s ease;}
+.framework-section[open] .framework-section-arrow{transform:rotate(90deg);color:var(--brand);}
+.framework-section-body{padding:10px 12px;display:grid;gap:8px;}
 .param-sync-title{font-size:13px;font-weight:700;color:var(--text);line-height:1.5;}
 .param-sync-desc{font-size:12px;color:var(--text-sub);line-height:1.6;margin-top:4px;}
 .param-sync-missing{font-size:11px;color:#B45309;line-height:1.6;margin-top:6px;}
@@ -855,12 +871,15 @@ html,body{overflow-x:hidden;}
 .ref-preview-wrap .rp-del{position:absolute;top:4px;right:4px;background:rgba(0,0,0,.55);color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:12px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;}
 .ref-badge{display:inline-block;background:var(--brand);color:#fff;font-size:11px;font-weight:600;padding:2px 8px;border-radius:8px;margin-left:6px;vertical-align:middle;}
 /* AI进阶 Tab */
-.ai-tab-wrap{flex:1;display:flex;flex-direction:column;overflow:hidden;}
-.ai-tab-body{flex:1;overflow-y:auto;padding:12px 14px;min-height:0;}
+.ai-tab-wrap{flex:1;display:flex;flex-direction:column;overflow:hidden;min-height:0;border-top:1px solid rgba(148,163,184,.14);}
+.ai-tab-body{flex:1;overflow-y:auto;padding:0 12px 0;min-height:0;}
 .ai-tab-body .chat-thread{display:block!important;max-height:none;margin:0;padding:4px 0;}
 .ai-tab-body .chat-thread.has-messages{display:block!important;}
-.ai-tab-chips{display:flex;gap:6px;flex-wrap:wrap;padding:8px 12px 4px;border-top:1px solid var(--border);}
+.ai-tab-chips{display:grid;gap:6px;padding:10px 12px 8px;border-top:1px solid var(--border);background:#fff;flex-shrink:0;}
 .ai-tab-bottom{padding:10px 12px 14px;border-top:1px solid var(--border);flex-shrink:0;background:#fff;}
+.sidebar-chat .msg-bubble{max-width:100%;}
+.sidebar-chat .chat-msg{align-items:flex-start;}
+.sidebar-chat .chat-send-btn{align-self:flex-end;}
 </style>
 </head>
 <body>
@@ -897,6 +916,21 @@ html,body{overflow-x:hidden;}
           <div>
             <span class="proj-title-text" id="current-project-name">当前项目</span>
             <span class="proj-meta-text" id="current-project-meta">等待生成图片</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="sidebar-chat" id="ops-assistant-panel">
+      <div class="sidebar-chat-label">运营 LLM 助手</div>
+      <div class="ai-tab-wrap">
+        <div class="ai-tab-body">
+          <div class="chat-thread" id="ops-chat-thread"></div>
+        </div>
+        <div class="ai-tab-chips" id="ops-chat-chips"></div>
+        <div class="ai-tab-bottom">
+          <div class="chat-input-row">
+            <input id="ops-chat-input" type="text" placeholder="例如：改成广发稳健主题，接入 110022 的近1年收益和基金经理信息" onkeydown="if(event.key==='Enter'){event.preventDefault();sendChat();}">
+            <button class="chat-send-btn" type="button" onclick="sendChat()">➤</button>
           </div>
         </div>
       </div>
@@ -956,6 +990,10 @@ html,body{overflow-x:hidden;}
               <div class="gen-text" id="gen-text">AI 正在创作中…</div>
               <div class="gen-bar-wrap"><div class="gen-bar" id="gen-bar"></div></div>
             </div>
+            <div class="cors-fallback-action" id="cors-fallback-action">
+              <span class="cors-fallback-note">跨域受限，已降级展示</span>
+              <button class="tb-btn primary" type="button" onclick="copyFallbackImageUrl()">复制结果 URL</button>
+            </div>
           </div>
         </div>
       </div>
@@ -989,15 +1027,16 @@ html,body{overflow-x:hidden;}
       <div class="right-panel" id="right-panel">
       <div class="right-resize-handle" id="right-resize-handle" title="拖拽调整右侧宽度"></div>
       <div class="right-tabs">
-        <div class="right-tab active" onclick="switchRightTab('params',this)">提示词生成</div>
-        <div class="right-tab disabled" id="right-tab-plan" onclick="switchRightTab('plan',this)">提示词预览</div>
+        <div class="right-tab active" onclick="switchRightTab('params',this)">步骤1：解析参考帖</div>
+        <div class="right-tab disabled" id="right-tab-plan" onclick="switchRightTab('plan',this)">步骤2：运营修改并生图</div>
       </div>
 
       <!-- Params tab -->
       <div class="right-content" id="tab-params">
         <div class="param-card" id="pre-plan-entry-card">
-          <div class="param-card-title">第一步</div>
-          <div style="font-size:13px;line-height:1.8;color:var(--text);margin-bottom:10px;">先在弹窗里填写图片链接和文字描述，再在下方确认基础配置。点击后会先生成基础配置，再生成最终描述 Prompt。</div>
+          <div class="param-card-title" id="pre-plan-entry-title">第一步：上传参考帖子并生成母版框架</div>
+          <div id="pre-plan-entry-desc" style="font-size:13px;line-height:1.8;color:var(--text);margin-bottom:10px;">先传入帖子图片和正文。点击后，接口 1 会返回 6 个结构字段和标准提示词，并自动进入运营修改界面。</div>
+          <button class="gen-btn" id="pre-plan-generate-btn" onclick="generateTextPlan()">第一步：生成母版框架并进入运营修改</button>
 
         </div>
         <div id="post-plan-config-section" style="display:none;">
@@ -1077,7 +1116,6 @@ html,body{overflow-x:hidden;}
             <textarea id="p-bg-prompt" rows="3" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-size:12px;outline:none;resize:vertical;font-family:monospace;color:var(--text);" placeholder="如：dark deep-blue tech background, scattered light particles, no text, NO TEXT NO WORDS"></textarea>
           </div>
         </div>
-        <button class="gen-btn" onclick="generateTextPlan()">生成提示词</button>
         <div class="ai-steps" id="ai-steps">
           <div class="ai-step" id="as1"><span class="step-ic">📝</span>LLM 生成完整生图描述</div>
           <div class="ai-step" id="as2"><span class="step-ic">🎨</span>Image API 生成完整图片</div>
@@ -1740,6 +1778,7 @@ const state = {
   promptStreamStatus:'idle',
   promptStreamError:'',
   promptParsed:null,
+  promptFramework:null,
   promptDraft:null,
   promptConfigResult:null,
   promptRecordId:'',
@@ -1749,6 +1788,17 @@ const state = {
   promptEnumsError:'',
   promptEnumsPromise:null,
   promptPreviewExpanded:false,
+  entityCompany:'',
+  entityProduct:'',
+  entityBindingFeedback:'',
+  promptDraftEdited:false,
+  finalPromptEdited:false,
+  opsSummaryText:'',
+  opsSummaryEdited:false,
+  opsChatMessages:[],
+  opsChatBusy:false,
+  fundDataRecord:null,
+  fundDataBindings:{},
   planStageUnlocked:false,
   lockedPlanPages:{},
   changedPlanPages:[],
@@ -1756,6 +1806,7 @@ const state = {
   canvasPreviewMode:'result',
   generationOptions:[],
   generationCompareMeta:null,
+  fallbackImageUrl:'',
 };
 
 // ── Page switching ──
@@ -1836,8 +1887,15 @@ function resetProjectForNewFlow() {
   state.promptStreamStatus = 'idle';
   state.promptStreamError = '';
   state.promptParsed = null;
+  state.promptFramework = createEmptyPromptFramework();
   state.promptDraft = createEmptyPromptDraft();
   state.promptPreviewExpanded = false;
+  state.opsSummaryText = '';
+  state.opsSummaryEdited = false;
+  state.opsChatMessages = [];
+  state.opsChatBusy = false;
+  state.fundDataRecord = null;
+  state.fundDataBindings = {};
   state.planStageUnlocked = false;
   state.lockedPlanPages = {};
   resetChartConfigSelection();
@@ -1873,7 +1931,9 @@ function resetProjectForNewFlow() {
   updateRefEntryStatus();
   renderReferenceStrip();
   renderTextPlan();
+  renderFundDataTable(null);
   renderPromptCard();
+  seedOpsAssistantMessages();
   syncPlanGenerateButtonsVisibility();
   setCanvasPreviewMode('result');
   closeReferenceDetail();
@@ -2015,7 +2075,12 @@ function initRightPanelResize() {
 
 function ensureReferenceRequired() {
   const ok = buildReferenceContext().hasReference;
+  renderPrePlanEntryCard();
   return ok;
+}
+
+function isFileProtocolRuntime() {
+  return String(window.location.protocol || '').toLowerCase() === 'file:';
 }
 
 function clipText(value, maxLen) {
@@ -4555,6 +4620,211 @@ function createEmptyPromptDraft() {
   };
 }
 
+function createEmptyPromptFramework() {
+  return {
+    visual_dna: {},
+    layout_slots: [],
+    copy_slots: {},
+    data_binding_slots: {},
+    constraints: {},
+    normalized_prompt: '',
+  };
+}
+
+function toPlainObject(value) {
+  return value && typeof value === 'object' && !Array.isArray(value) ? value : {};
+}
+
+function toStringArray(value) {
+  if (Array.isArray(value)) return value.map(item => String(item || '').trim()).filter(Boolean);
+  if (typeof value === 'string') return value.split(/\r?\n|,/).map(item => item.trim()).filter(Boolean);
+  return [];
+}
+
+function normalizePromptFramework(payload) {
+  const base = createEmptyPromptFramework();
+  const source = toPlainObject(payload);
+  const result = toPlainObject(source.result);
+  const visualDNA = toPlainObject(source.visual_dna || source.visualDNA || source.visual || result.visual_dna || result.visualDNA || result.visual);
+  const copySlots = toPlainObject(source.copy_slots || source.copySlots || source.copy || result.copy_slots || result.copySlots || result.copy);
+  const dataBindingSlots = toPlainObject(source.data_binding_slots || source.dataBindingSlots || source.data_bindings || result.data_binding_slots || result.dataBindingSlots || result.data_bindings);
+  const constraints = toPlainObject(source.constraints || result.constraints);
+  const layoutSource = source.layout_slots || source.layoutSlots || result.layout_slots || result.layoutSlots || [];
+  const normalizedPrompt = String(
+    source.normalized_prompt ||
+    source.normalizedPrompt ||
+    source.prompt ||
+    source.image_prompt ||
+    result.normalized_prompt ||
+    result.normalizedPrompt ||
+    result.prompt ||
+    result.image_prompt ||
+    ''
+  ).trim();
+
+  base.visual_dna = Object.fromEntries(Object.entries(visualDNA).map(([key, value]) => [key, Array.isArray(value) ? value.join('、') : String(value || '').trim()]).filter(([, value]) => value));
+  base.layout_slots = Array.isArray(layoutSource)
+    ? layoutSource.map((item, index) => {
+        if (typeof item === 'string') return { name: item, description: '' };
+        const row = toPlainObject(item);
+        return {
+          id: String(row.id || row.key || row.slot || `slot_${index + 1}`).trim(),
+          name: String(row.name || row.label || row.slot || row.section || `模块${index + 1}`).trim(),
+          description: String(row.description || row.role || row.objective || row.summary || '').trim(),
+        };
+      }).filter(item => item.name)
+    : [];
+  base.copy_slots = Object.fromEntries(Object.entries(copySlots).map(([key, value]) => [key, Array.isArray(value) ? value.join('\n') : String(value || '').trim()]).filter(([, value]) => value));
+  base.data_binding_slots = Object.fromEntries(Object.entries(dataBindingSlots).map(([key, value]) => [key, String(value || '').trim()]).filter(([, value]) => value));
+  base.constraints = Object.fromEntries(Object.entries(constraints).map(([key, value]) => [key, Array.isArray(value) ? value.join('、') : String(value || '').trim()]).filter(([, value]) => value));
+  base.normalized_prompt = normalizedPrompt;
+  return base;
+}
+
+function hasPromptFrameworkContent(framework) {
+  const data = normalizePromptFramework(framework);
+  return !!(
+    Object.keys(data.visual_dna).length ||
+    data.layout_slots.length ||
+    Object.keys(data.copy_slots).length ||
+    Object.keys(data.data_binding_slots).length ||
+    Object.keys(data.constraints).length ||
+    data.normalized_prompt
+  );
+}
+
+function buildPromptFrameworkFallbackFromDraft(draft, promptText) {
+  const normalizedDraft = normalizePromptDraft(draft || createEmptyPromptDraft());
+  const fallback = createEmptyPromptFramework();
+  const current = getCurrentConfigSnapshot();
+  const pages = Array.isArray(state.textPlan && state.textPlan.pages) ? state.textPlan.pages : [];
+  fallback.visual_dna = {
+    platform_style: normalizedDraft.config.platformStyle || current.platformStyle || '',
+    visual_style: normalizedDraft.config.visualStyle || current.visualStyle || '',
+    image_mode: normalizedDraft.config.imageMode || current.imageMode || '',
+    ip_usage: normalizedDraft.config.ipUsage || current.ipUsage || '',
+  };
+  fallback.layout_slots = pages.map((page, index) => ({
+    id: String(page.page_no || index + 1),
+    name: page.section_label || `模块 ${index + 1}`,
+    description: page.content_summary || page.objective || '',
+  }));
+  fallback.copy_slots = {
+    product_name: normalizedDraft.config.productName || current.productName || '',
+    theme: normalizedDraft.config.theme || current.theme || '',
+    business_note: normalizedDraft.config.extra || current.extra || '',
+  };
+  if (normalizedDraft.title) fallback.copy_slots.headline = normalizedDraft.title;
+  if (normalizedDraft.description) fallback.copy_slots.description = normalizedDraft.description;
+  fallback.data_binding_slots = {
+    fund_name: 'name',
+    fund_code: 'code',
+    nav: 'nav',
+    y1_return: 'y1',
+    y3_return: 'y3',
+    aum: 'scale',
+    fee_rate: 'fee',
+    manager_name: 'manager',
+    risk_level: 'risk',
+    top_holding: 'topHolding',
+  };
+  fallback.constraints = {
+    must_keep: '保留参考帖信息层级、构图骨架与品牌识别区',
+    compliance: '收益、风险、基金经理等字段优先使用真实数据，不要自由编造',
+  };
+  fallback.normalized_prompt = resolvePromptPreviewText(promptText || state.descriptionPrompt || state.promptStreamText || buildPromptDraftCombined(normalizedDraft));
+  return normalizePromptFramework(fallback);
+}
+
+function getActivePromptFramework() {
+  if (hasPromptFrameworkContent(state.promptFramework)) return normalizePromptFramework(state.promptFramework);
+  return buildPromptFrameworkFallbackFromDraft(state.promptDraft || createEmptyPromptDraft(), state.descriptionPrompt || state.promptStreamText || '');
+}
+
+function humanizeFrameworkKey(key) {
+  const map = {
+    platform_style: '平台风格',
+    visual_style: '视觉风格',
+    image_mode: '出图模式',
+    ip_usage: 'IP使用策略',
+    color_style: '配色风格',
+    mood: '画面情绪',
+    layout_change: '版式调整',
+    business_note: '业务说明',
+    product_name: '产品名称',
+    theme: '传播主题',
+    fund_name: '基金名称',
+    fund_code: '基金代码',
+    nav: '最新净值',
+    nav_date: '净值日期',
+    y1_return: '近1年收益',
+    y3_return: '近3年收益',
+    aum: '规模',
+    fee_rate: '费率',
+    manager_name: '基金经理',
+    risk_level: '风险等级',
+    top_holding: '重仓股',
+    headline: '主标题',
+    subheadline: '副标题',
+    body_copy: '正文',
+    cta: '行动引导',
+    must_keep: '必须保留',
+    avoid: '避免事项',
+    compliance: '合规要求',
+  };
+  return map[key] || String(key || '').replace(/[_-]+/g, ' ').trim();
+}
+
+function getValueByPath(source, path) {
+  const rawPath = String(path || '').trim();
+  if (!rawPath) return '';
+  const direct = source ? source[rawPath] : undefined;
+  if (direct !== undefined && direct !== null && direct !== '') return direct;
+  const nested = rawPath.split('.').reduce((acc, key) => (acc && acc[key] !== undefined ? acc[key] : undefined), source);
+  if (nested !== undefined && nested !== null && nested !== '') return nested;
+  return rawPath.split('.').reduce((acc, key) => (acc && acc[key] !== undefined ? acc[key] : undefined), source && source.raw);
+}
+
+function formatFundDataValue(slotKey, value) {
+  if (value === undefined || value === null) return '';
+  const text = String(value).trim();
+  if (!text) return '';
+  if (/^(nav|yield|return|y\d|m\d)/i.test(slotKey) && /^-?\d+(\.\d+)?$/.test(text)) {
+    return `${text}%`;
+  }
+  return text;
+}
+
+function buildFrameworkSummaryText(framework, dataBindings) {
+  const data = normalizePromptFramework(framework);
+  const sections = [];
+  const copyLines = Object.entries(data.copy_slots).map(([key, value]) => `${humanizeFrameworkKey(key)}：${value}`).filter(Boolean);
+  if (copyLines.length) sections.push(`运营文案字段：\n${copyLines.map(line => `- ${line}`).join('\n')}`);
+  const bindingLines = Object.entries(dataBindings || {}).map(([key, value]) => `${humanizeFrameworkKey(key)}：${value}`).filter(Boolean);
+  if (bindingLines.length) sections.push(`已接入真实数据：\n${bindingLines.map(line => `- ${line}`).join('\n')}`);
+  const visualLines = Object.entries(data.visual_dna).map(([key, value]) => `${humanizeFrameworkKey(key)}：${value}`).filter(Boolean);
+  if (visualLines.length) sections.push(`视觉表达：\n${visualLines.map(line => `- ${line}`).join('\n')}`);
+  const constraintLines = Object.entries(data.constraints).map(([key, value]) => `${humanizeFrameworkKey(key)}：${value}`).filter(Boolean);
+  if (constraintLines.length) sections.push(`约束条件：\n${constraintLines.map(line => `- ${line}`).join('\n')}`);
+  return sections.join('\n\n').trim();
+}
+
+function rebuildPromptFromFramework(forcePrompt) {
+  const framework = getActivePromptFramework();
+  const summaryText = buildFrameworkSummaryText(framework, state.fundDataBindings);
+  if (!state.opsSummaryEdited || forcePrompt) {
+    state.opsSummaryText = summaryText;
+  }
+  const finalPrompt = [
+    framework.normalized_prompt || '',
+    state.opsSummaryText ? `运营修改汇总：\n${state.opsSummaryText}` : '',
+  ].filter(Boolean).join('\n\n');
+  if (!state.finalPromptEdited || forcePrompt) {
+    state.descriptionPrompt = finalPrompt;
+  }
+  state.promptFramework = framework;
+}
+
 function getPromptDraftConfigObject(draft) {
   const data = normalizePromptDraft(draft);
   const config = {};
@@ -4635,7 +4905,9 @@ function buildDescriptionGeneratePayload(config, postContent, imageUrl) {
   const current = getCurrentConfigSnapshot();
   const safeImageUrl = String(imageUrl || '').trim();
   const safePostContent = String(postContent || '').trim();
-  const finalPostContent = safePostContent || '参考图营销文案生成';
+  // description-generate 在部分后端实现上对 image_url + post_content 同时传入不稳定，
+  // 这里优先传 image_url；仅当没有图片时再传 post_content。
+  const finalPostContent = safeImageUrl ? '' : (safePostContent || '参考图营销文案生成');
   const promptRecordId = String(
     state.promptRecordId ||
     (config && (config.promptRecordId || config.prompt_record_id || config.recordId || config.record_id)) ||
@@ -4857,8 +5129,8 @@ function setPromptDraftField(path, value) {
     next[path] = String(value || '');
   }
   state.promptDraft = next;
+  state.promptDraftEdited = true;
   state.descriptionPrompt = '';
-  renderPromptCard();
 }
 
 function togglePromptPreviewExpanded() {
@@ -4868,6 +5140,7 @@ function togglePromptPreviewExpanded() {
 
 function setFinalPrompt(value) {
   state.descriptionPrompt = String(value || '');
+  state.finalPromptEdited = true;
 }
 
 function buildPromptDraftCombined(draft) {
@@ -4904,85 +5177,161 @@ function buildPromptDraftCombined(draft) {
   return sections.join('\n\n').trim();
 }
 
+function setOpsSummaryText(value) {
+  state.opsSummaryText = String(value || '');
+  state.opsSummaryEdited = true;
+  rebuildPromptFromFramework(false);
+}
+
+function bindFundDataSlot(slotKey) {
+  const framework = getActivePromptFramework();
+  const path = framework.data_binding_slots[slotKey];
+  if (!state.fundDataRecord) {
+    showToast('请先查询真实数据', false);
+    return;
+  }
+  const rawValue = getValueByPath(state.fundDataRecord, path);
+  const formatted = formatFundDataValue(slotKey, rawValue);
+  if (!formatted) {
+    showToast(`当前数据源里未找到 ${humanizeFrameworkKey(slotKey)}`, false);
+    return;
+  }
+  state.fundDataBindings[slotKey] = formatted;
+  if (framework.copy_slots[slotKey] !== undefined) {
+    framework.copy_slots[slotKey] = formatted;
+  }
+  if (slotKey === 'fund_name') setPromptConfigSelection('productName', formatted);
+  rebuildPromptFromFramework(true);
+  renderPromptCard();
+  showToast(`${humanizeFrameworkKey(slotKey)} 已接入真实数据`, true);
+}
+
+function applyFundDataSelectionBySlots(slots) {
+  const list = Array.isArray(slots) ? slots : [];
+  list.forEach((slotKey) => {
+    if (slotKey) bindFundDataSlot(slotKey);
+  });
+}
+
+function clearFundDataBindings() {
+  state.fundDataBindings = {};
+  rebuildPromptFromFramework(true);
+  renderPromptCard();
+  showToast('已清空当前真实数据绑定', true);
+}
+
 function renderPromptCard() {
   const wrap = document.getElementById('prompt-result-card');
   if (!wrap) return;
+  const framework = getActivePromptFramework();
+  rebuildPromptFromFramework(false);
   if (state.promptStreamStatus === 'idle') {
     wrap.innerHTML = `<div class="param-card" style="margin-bottom:0;">
-      <div class="param-card-title">提示词预览</div>
-      <div style="font-size:13px;line-height:1.8;color:var(--text-sub);">点击“生成提示词”后，这里会展示解析结果；完整提示词默认收起，需要时可展开查看。</div>
+      <div class="param-card-title">第二步：运营修改并生图</div>
+      <div style="font-size:13px;line-height:1.8;color:var(--text-sub);">请先在第一步点击“生成母版框架并进入运营修改”。成功后，这里会展示 6 个结构字段、真实数据绑定区和最终生图提示词。</div>
     </div>`;
     return;
   }
   const statusText = state.promptStreamStatus === 'streaming'
-    ? '正在执行两步提示词生成...'
+    ? '接口 1 正在解析参考帖并生成结构化母版框架...'
     : state.promptStreamStatus === 'success'
-      ? `基础配置与描述 Prompt 已生成（${state.promptLastUpdatedAt ? new Date(state.promptLastUpdatedAt).toLocaleTimeString() : ''}）`
+      ? `母版框架与标准提示词已生成（${state.promptLastUpdatedAt ? new Date(state.promptLastUpdatedAt).toLocaleTimeString() : ''}）`
       : state.promptStreamStatus === 'error'
         ? `提示词生成失败：${escapeHtml(state.promptStreamError || '未知错误')}`
         : '等待中';
-  const draft = normalizePromptDraft(state.promptDraft || createEmptyPromptDraft());
-  const combinedPrompt = String(state.descriptionPrompt || '').trim() || buildPromptDraftCombined(draft);
-  const fieldInput = (label, path, value, type) => {
-    if (type === 'textarea') {
-      return `<div class="plan-edit-block">
-        <div class="plan-edit-label">${label}</div>
-        <textarea class="plan-edit-textarea" oninput="setPromptDraftField('${path}', this.value)">${escapeHtml(value || '')}</textarea>
-      </div>`;
-    }
-    return `<div class="plan-edit-block">
-      <div class="plan-edit-label">${label}</div>
-      <input class="plan-edit-input" value="${escapeHtml(value || '')}" oninput="setPromptDraftField('${path}', this.value)">
-    </div>`;
-  };
   const previewExpanded = !!state.promptPreviewExpanded;
+  const combinedPrompt = String(state.descriptionPrompt || framework.normalized_prompt || '').trim();
+  const frameworkSection = (title, meta, entries, emptyText, open, extraHtml) => `<details class="framework-section"${open ? ' open' : ''}>
+      <summary>
+        <div class="framework-section-title">
+          <div class="framework-section-name">${title}</div>
+          <div class="framework-section-meta">${meta}</div>
+        </div>
+        <span class="framework-section-arrow">›</span>
+      </summary>
+      <div class="framework-section-body">
+        ${entries && entries.length ? entries.join('') : `<div style="font-size:12px;color:var(--text-muted);">${emptyText}</div>`}
+        ${extraHtml || ''}
+      </div>
+    </details>`;
+  const visualEntries = Object.entries(framework.visual_dna).map(([key, value]) => `<div class="assistant-guide-item"><div class="assistant-guide-label">${escapeHtml(humanizeFrameworkKey(key))}</div><div class="assistant-guide-value">${escapeHtml(value)}</div></div>`);
+  const layoutEntries = framework.layout_slots.map((item) => `<div class="assistant-guide-item"><div class="assistant-guide-label">${escapeHtml(item.name)}</div><div class="assistant-guide-value">${escapeHtml(item.description || '结构已锁定，可通过左侧 LLM 助手微调文案与表达')}</div></div>`);
+  const copyEntries = Object.entries(framework.copy_slots).map(([key, value]) => `<div class="assistant-guide-item"><div class="assistant-guide-label">${escapeHtml(humanizeFrameworkKey(key))}</div><div class="assistant-guide-value">${escapeHtml(value)}</div></div>`);
+  const constraintEntries = Object.entries(framework.constraints).map(([key, value]) => `<div class="assistant-guide-item"><div class="assistant-guide-label">${escapeHtml(humanizeFrameworkKey(key))}</div><div class="assistant-guide-value">${escapeHtml(value)}</div></div>`);
+  const bindingEntries = Object.entries(framework.data_binding_slots).map(([key, value]) => {
+    const bound = state.fundDataBindings[key];
+    return `<div class="assistant-guide-item">
+      <div class="assistant-guide-label">${escapeHtml(humanizeFrameworkKey(key))}</div>
+      <div class="assistant-guide-value">${escapeHtml(bound || value)}</div>
+    </div>`;
+  });
+  const dataRecord = state.fundDataRecord;
+  const dataSummary = dataRecord
+    ? `<div class="assistant-guide-grid">
+        <div class="assistant-guide-item"><div class="assistant-guide-label">基金代码</div><div class="assistant-guide-value">${escapeHtml(dataRecord.code || '-')}</div></div>
+        <div class="assistant-guide-item"><div class="assistant-guide-label">基金名称</div><div class="assistant-guide-value">${escapeHtml(dataRecord.name || '-')}</div></div>
+        <div class="assistant-guide-item"><div class="assistant-guide-label">最新净值</div><div class="assistant-guide-value">${escapeHtml(dataRecord.nav || '-')}</div></div>
+        <div class="assistant-guide-item"><div class="assistant-guide-label">近1年收益</div><div class="assistant-guide-value">${escapeHtml(dataRecord.y1 || '-')}</div></div>
+        <div class="assistant-guide-item"><div class="assistant-guide-label">基金经理</div><div class="assistant-guide-value">${escapeHtml(dataRecord.manager || '-')}</div></div>
+        <div class="assistant-guide-item"><div class="assistant-guide-label">风险等级</div><div class="assistant-guide-value">${escapeHtml(dataRecord.risk || '-')}</div></div>
+      </div>`
+    : `<div style="font-size:12px;color:var(--text-muted);">左侧助手里输入基金代码，或在这里查询后再将字段绑定到母版。</div>`;
+  const frameworkSummary = [
+    ['视觉风格', Object.keys(framework.visual_dna).length],
+    ['版式模块', framework.layout_slots.length],
+    ['文案字段', Object.keys(framework.copy_slots).length],
+    ['数据绑定', Object.keys(framework.data_binding_slots).length],
+    ['约束条件', Object.keys(framework.constraints).length],
+    ['提示词', framework.normalized_prompt ? 1 : 0],
+  ];
   wrap.innerHTML = `<div style="display:grid;gap:12px;">
     <div class="param-card" style="margin-bottom:0;">
-      <div class="param-card-title">字段结果</div>
+      <div class="param-card-title">接口 1 返回的母版框架</div>
       <div style="font-size:12px;color:var(--text-sub);margin-bottom:10px;">${escapeHtml(statusText)}</div>
-      <div style="display:grid;gap:10px;">
-        ${fieldInput('标题', 'title', draft.title, 'input')}
-        ${fieldInput('描述', 'description', draft.description, 'textarea')}
-        ${fieldInput('分析', 'analysis', draft.analysis.join('\n'), 'textarea')}
-        <div class="plan-inline-grid">
-          ${fieldInput('类型', 'config.typeName', draft.config.typeName, 'input')}
-          ${fieldInput('方向', 'config.typeOption', draft.config.typeOption, 'input')}
-        </div>
-        <div class="plan-inline-grid">
-          ${fieldInput('出图模式', 'config.imageMode', draft.config.imageMode, 'input')}
-          ${fieldInput('图片数量', 'config.imageCount', draft.config.imageCount, 'input')}
-        </div>
-        <div class="plan-inline-grid">
-          ${fieldInput('平台', 'config.platform', draft.config.platform, 'input')}
-          ${fieldInput('IP/素材策略', 'config.ipUsage', draft.config.ipUsage, 'input')}
-        </div>
-        ${fieldInput('平台风格', 'config.platformStyle', draft.config.platformStyle, 'textarea')}
-        ${fieldInput('视觉风格', 'config.visualStyle', draft.config.visualStyle, 'textarea')}
-        <div class="plan-inline-grid">
-          ${fieldInput('主体名称', 'config.productName', draft.config.productName, 'input')}
-          ${fieldInput('主题', 'config.theme', draft.config.theme, 'input')}
-        </div>
-        ${fieldInput('额外要求', 'config.extra', draft.config.extra, 'textarea')}
-        ${fieldInput('背景提示', 'config.backgroundPrompt', draft.config.backgroundPrompt, 'textarea')}
-        <div class="plan-inline-grid">
-          ${fieldInput('图表开关', 'config.chartEnabled', draft.config.chartEnabled, 'input')}
-          ${fieldInput('图表产品代码', 'config.chartProductCode', draft.config.chartProductCode, 'input')}
-        </div>
-        <div class="plan-inline-grid">
-          ${fieldInput('图表样式', 'config.chartStyle', draft.config.chartStyle, 'input')}
-          ${fieldInput('图表周期', 'config.chartPeriod', draft.config.chartPeriod, 'input')}
-        </div>
-        ${fieldInput('图表模块', 'config.chartModules', draft.config.chartModules, 'textarea')}
-        ${fieldInput('缺失项', 'missingFields', draft.missingFields.join('\n'), 'textarea')}
+      <div class="framework-summary">
+        ${frameworkSummary.map(([label, count]) => `<span class="framework-pill">${escapeHtml(label)} <b>${escapeHtml(String(count))}</b></span>`).join('')}
+      </div>
+      <div class="framework-sections">
+        ${frameworkSection('视觉风格 DNA', '平台风格、画面气质、视觉表达方向', visualEntries, '暂无视觉风格信息，等待接口返回。', true)}
+        ${frameworkSection('版式槽位', '这张帖子被拆成哪些内容区块', layoutEntries, '暂无版式槽位。', false)}
+        ${frameworkSection('文案槽位', '运营最常改的标题、正文、CTA 等字段', copyEntries, '暂无文案槽位。', true)}
+        ${frameworkSection('数据绑定槽位', '可绑定真实基金数据的字段入口', bindingEntries, '暂无数据绑定槽位。', false)}
+        ${frameworkSection('约束条件', '保留项、限制项、合规要求', constraintEntries, '暂无约束条件。', false)}
+        ${frameworkSection('标准提示词', '给生图模型使用的底层提示词骨架', [], '', false, `<textarea class="plan-edit-textarea" style="min-height:160px;" oninput="state.promptFramework = getActivePromptFramework(); state.promptFramework.normalized_prompt = this.value; state.finalPromptEdited = false; rebuildPromptFromFramework(true); renderPromptCard();">${escapeHtml(framework.normalized_prompt || '')}</textarea>`)}
       </div>
     </div>
     <div class="param-card" style="margin-bottom:0;">
+      <div class="param-card-title">运营修改与真实数据接入</div>
+      <div style="font-size:12px;color:var(--text-sub);line-height:1.7;margin-bottom:10px;">左侧 LLM 助手负责接收运营自然语言指令。你可以直接说“改业务内容”“选真实数据”“改视觉表达”；查询到真实数据后，在这里统一写入当前数据槽位。</div>
+      <div class="plan-inline-grid" style="margin-bottom:10px;">
+        <div class="plan-edit-block">
+          <div class="plan-edit-label">真实数据基金代码</div>
+          <div class="input-row">
+            <input id="ops-fund-code" type="text" placeholder="例如 110022" value="${escapeHtml((state.fundDataRecord && state.fundDataRecord.code) || '')}">
+          </div>
+        </div>
+        <div class="plan-edit-block">
+          <div class="plan-edit-label">操作</div>
+          <div class="export-row">
+            <button class="tb-btn" type="button" onclick="ifindSearch()">查询真实数据</button>
+            <button class="tb-btn" type="button" onclick="ifindSync()">写入当前数据</button>
+            <button class="tb-btn" type="button" onclick="clearFundDataBindings()">清空绑定</button>
+          </div>
+        </div>
+      </div>
+      ${dataSummary}
+    </div>
+    <div class="param-card" style="margin-bottom:0;">
+      <div class="param-card-title">修改后的数据文字汇总</div>
+      <textarea class="plan-edit-textarea" style="min-height:220px;" oninput="setOpsSummaryText(this.value)">${escapeHtml(state.opsSummaryText || '')}</textarea>
+    </div>
+    <div class="param-card" style="margin-bottom:0;">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;" onclick="togglePromptPreviewExpanded()">
-        <div class="param-card-title" style="margin-bottom:0;">最终提示词</div>
+        <div class="param-card-title" style="margin-bottom:0;">最终生图提示词</div>
         <button class="tb-btn" type="button" onclick="event.stopPropagation(); togglePromptPreviewExpanded();">${previewExpanded ? '收起' : '展开'}</button>
       </div>
       ${previewExpanded ? `<textarea class="plan-edit-textarea" style="min-height:220px;margin-top:10px;font-size:13px;line-height:1.8;" oninput="setFinalPrompt(this.value)">${escapeHtml(combinedPrompt || '')}</textarea>` : `<div style="font-size:12px;color:var(--text-sub);margin-top:10px;">默认收起。需要时可展开查看完整提示词。</div>`}
-      ${state.promptStreamStatus === 'success' ? `<div class="export-row" style="margin-top:10px;"><button class="apply-btn" style="flex:1;margin-top:0;" onclick="confirmPlanAndGenerate()">确认并生图</button></div>` : ''}
+      ${state.promptStreamStatus === 'success' ? `<div class="export-row" style="margin-top:10px;"><button class="tb-btn" type="button" onclick="rebuildPromptFromFramework(true); renderPromptCard();">按当前修改重建提示词</button><button class="apply-btn" style="flex:1;margin-top:0;" onclick="confirmPlanAndGenerate()">确认并生图</button></div>` : ''}
     </div>
   </div>`;
 }
@@ -5003,8 +5352,200 @@ function renderPlanStageUI() {
   const configSection = document.getElementById('post-plan-config-section');
   const planTab = document.getElementById('right-tab-plan');
   if (entryCard) entryCard.style.display = state.planStageUnlocked ? 'none' : 'block';
-  if (configSection) configSection.style.display = 'block';
+  if (configSection) configSection.style.display = 'none';
   if (planTab) planTab.classList.toggle('disabled', !state.planStageUnlocked);
+  renderPrePlanEntryCard();
+}
+
+function renderPrePlanEntryCard() {
+  const titleEl = document.getElementById('pre-plan-entry-title');
+  const descEl = document.getElementById('pre-plan-entry-desc');
+  const btnEl = document.getElementById('pre-plan-generate-btn');
+  const hasReference = buildReferenceContext().hasReference;
+  if (titleEl) titleEl.textContent = hasReference ? '第一步：已应用参考内容，可生成母版框架' : '第一步：请选择参考图及正文';
+  if (descEl) {
+    descEl.textContent = hasReference
+      ? '请点击按钮，让接口 1 返回 6 个结构字段和标准提示词，随后进入运营修改与生图。'
+      : '请先在左侧通过“参考图 / 资源库”选择参考图并补充正文内容，再进行下一步。';
+  }
+  if (btnEl) {
+    btnEl.disabled = !hasReference;
+    btnEl.style.opacity = hasReference ? '1' : '.55';
+    btnEl.style.cursor = hasReference ? 'pointer' : 'not-allowed';
+  }
+}
+
+function ensurePromptStepDefaultSelections() {
+  const enums = getPromptEnums();
+  const selectedType = getSelectedTypeName();
+  if (!selectedType && enums.typeNames && enums.typeNames.length) {
+    setChipSelection('chips-type', enums.typeNames[0], 'type');
+  }
+  const selectedPlatform = ((document.querySelector('#chips-platform .chip.selected') || {}).textContent || '').trim();
+  if (!selectedPlatform && enums.platforms && enums.platforms.length) {
+    setChipSelection('chips-platform', enums.platforms[0], 'platform');
+  }
+  if (!state.imageMode) {
+    setChipSelection('chips-image-mode', '单图', 'imageMode');
+  }
+  const selectedIp = ((document.querySelector('#chips-ip .chip.selected') || {}).textContent || '').trim();
+  if (!selectedIp && enums.ipUsages && enums.ipUsages.length) {
+    setChipSelection('chips-ip', enums.ipUsages[0], 'ip');
+  }
+  const typeOptionConfig = getCurrentTypeOptionConfig();
+  if (!state.typeOption && typeOptionConfig.options && typeOptionConfig.options.length) {
+    setTypeOption(typeOptionConfig.options[0]);
+  }
+}
+
+function setPromptConfigSelection(key, value) {
+  const next = String(value == null ? '' : value);
+  if (key === 'typeName') {
+    setChipSelection('chips-type', next, 'type');
+    const cfg = getCurrentTypeOptionConfig();
+    if (!cfg.options.includes(state.typeOption) && cfg.options.length) {
+      setTypeOption(cfg.options[0]);
+    }
+  } else if (key === 'typeOption') {
+    setTypeOption(next);
+  } else if (key === 'platform') {
+    setChipSelection('chips-platform', next, 'platform');
+  } else if (key === 'imageMode') {
+    setChipSelection('chips-image-mode', next === 'multi' ? '多图' : '单图', 'imageMode');
+  } else if (key === 'imageCount') {
+    const n = Math.max(2, Math.min(8, Number(next) || 2));
+    state.genCount = n;
+    const countInput = document.getElementById('gen-count-input');
+    if (countInput) countInput.value = String(n);
+  } else if (key === 'ipUsage') {
+    setChipSelection('chips-ip', next, 'ip');
+  } else if (key === 'productName') {
+    setFieldValue('p-name', next);
+  } else if (key === 'theme') {
+    setFieldValue('p-theme', next);
+  } else if (key === 'extra') {
+    setFieldValue('p-extra', next);
+  } else if (key === 'platformStyle') {
+    setFieldValue('platform-style-input', next);
+  } else if (key === 'visualStyle') {
+    setFieldValue('visual-style-input', next);
+  } else if (key === 'backgroundPrompt') {
+    setFieldValue('p-bg-prompt', next);
+  }
+
+  state.promptDraft = mergeSelectedEnumConfigIntoPromptDraft(state.promptDraft || createEmptyPromptDraft());
+  state.descriptionPrompt = '';
+  renderPromptCard();
+}
+
+function setEntityBindingInput(key, value) {
+  const next = String(value || '').trim();
+  if (key === 'company') state.entityCompany = next;
+  if (key === 'product') state.entityProduct = next;
+}
+
+function replacePromptTextByBinding(text, companyName, productName) {
+  let output = String(text || '');
+  const safeCompany = String(companyName || '').trim();
+  const safeProduct = String(productName || '').trim();
+
+  const companyCandidates = [
+    '广发基金','富国基金','易方达基金','华夏基金','南方基金','嘉实基金','招商基金','中欧基金','汇添富基金','博时基金'
+  ];
+  const sourceCompany = (getAppliedReferencePost() && getAppliedReferencePost().institution) || '';
+  if (sourceCompany) companyCandidates.unshift(sourceCompany);
+
+  const productCandidates = [
+    '广发恒荣三个月持有期混合C',
+    '广发中证500指增',
+    String((state.promptDraft && state.promptDraft.config && state.promptDraft.config.productName) || '').trim(),
+    String(((document.getElementById('p-name') || {}).value) || '').trim(),
+  ].filter(Boolean);
+
+  if (safeCompany) {
+    companyCandidates
+      .filter(Boolean)
+      .filter(name => name !== safeCompany)
+      .forEach((name) => {
+        output = output.split(name).join(safeCompany);
+      });
+    output = output.replace(/(基金管理人[：:])\s*[^\n，。；;]+/g, `$1 ${safeCompany}`);
+  }
+
+  if (safeProduct) {
+    productCandidates
+      .filter(Boolean)
+      .filter(name => name !== safeProduct)
+      .forEach((name) => {
+        output = output.split(name).join(safeProduct);
+      });
+    output = output.replace(/(产品名称[：:])\s*[^\n，。；;]+/g, `$1 ${safeProduct}`);
+    output = output.replace(/(基金名称[：:])\s*[^\n，。；;]+/g, `$1 ${safeProduct}`);
+  }
+
+  return output;
+}
+
+function mapStringsDeep(value, mapper) {
+  if (typeof value === 'string') return mapper(value);
+  if (Array.isArray(value)) return value.map(item => mapStringsDeep(item, mapper));
+  if (value && typeof value === 'object') {
+    const next = {};
+    Object.keys(value).forEach((key) => {
+      next[key] = mapStringsDeep(value[key], mapper);
+    });
+    return next;
+  }
+  return value;
+}
+
+function applyPromptEntityBindings() {
+  const companyName = String(state.entityCompany || '').trim();
+  const productName = String(state.entityProduct || '').trim();
+  if (!companyName && !productName) {
+    state.entityBindingFeedback = '请先填写基金公司或产品名称';
+    renderPromptCard();
+    showToast('请先填写基金公司或产品名称', false);
+    return;
+  }
+
+  const beforeBundle = JSON.stringify({
+    draft: state.promptDraft || createEmptyPromptDraft(),
+    descriptionPrompt: state.descriptionPrompt || '',
+    promptStreamText: state.promptStreamText || '',
+    textPlan: state.textPlan || null,
+  });
+
+  if (productName) {
+    setFieldValue('p-name', productName);
+  }
+
+  state.promptDraft = mapStringsDeep(normalizePromptDraft(state.promptDraft || createEmptyPromptDraft()),
+    (text) => replacePromptTextByBinding(text, companyName, productName));
+  state.descriptionPrompt = replacePromptTextByBinding(state.descriptionPrompt || '', companyName, productName);
+  state.promptStreamText = replacePromptTextByBinding(state.promptStreamText || '', companyName, productName);
+
+  if (state.textPlan && Array.isArray(state.textPlan.pages)) {
+    state.textPlan.pages = state.textPlan.pages.map(page => mapStringsDeep(page,
+      (text) => replacePromptTextByBinding(text, companyName, productName)));
+  }
+
+  const afterBundle = JSON.stringify({
+    draft: state.promptDraft || createEmptyPromptDraft(),
+    descriptionPrompt: state.descriptionPrompt || '',
+    promptStreamText: state.promptStreamText || '',
+    textPlan: state.textPlan || null,
+  });
+  const changed = beforeBundle !== afterBundle;
+  const time = new Date().toLocaleTimeString();
+  state.entityBindingFeedback = changed
+    ? `已完成替换（${time}）`
+    : `未检测到可替换内容（${time}）`;
+
+  if (productName) setPromptConfigSelection('productName', productName);
+  renderTextPlan();
+  renderPromptCard();
+  showToast(changed ? '已按基金公司/产品名称替换提示词与文案计划' : '未检测到可替换内容', changed);
 }
 
 function renderTextPlan() {
@@ -5061,12 +5602,7 @@ async function generateTextPlan() {
     return;
   }
   await ensurePromptEnumsLoaded(false);
-  const missingRequired = getMissingPromptRequiredFields();
-  if (missingRequired.length) {
-    showToast(`请先选择${missingRequired.join('、')}，再生成提示词`, false);
-    switchRightTab('params', document.querySelectorAll('.right-tab')[0]);
-    return;
-  }
+  ensurePromptStepDefaultSelections();
   state.planStageUnlocked = true;
   if (state.imageMode !== 'multi') {
     state.genCount = 1;
@@ -5092,11 +5628,7 @@ async function generateTextPlan() {
     return;
   }
   if (!hasDescriptionStreamApi) {
-    state.promptReady = false;
-    state.promptStreamText = '';
-    syncPlanGenerateButtonsVisibility();
-    showToast('提示词预览已更新，但描述 Prompt 接口地址为空。', false);
-    return;
+    showToast('描述 Prompt 接口地址为空，将使用基础配置自动组合可编辑提示词。', false);
   }
 
   const referenceContext = buildReferenceContext();
@@ -5119,16 +5651,23 @@ async function generateTextPlan() {
     state.promptStreamEvents = [];
     state.promptStreamRaw = '';
     state.promptParsed = null;
+    state.promptFramework = createEmptyPromptFramework();
     state.promptDraft = createEmptyPromptDraft();
     state.promptConfigResult = null;
     state.promptRecordId = '';
     state.descriptionPrompt = '';
+    state.promptDraftEdited = false;
+    state.finalPromptEdited = false;
+    state.opsSummaryText = '';
+    state.opsSummaryEdited = false;
     renderTextPlan();
     renderPromptCard();
-    showToast('第一步：正在生成基础配置...', false);
+    showToast('第一步：正在解析参考帖并生成母版框架...', false);
     const promptText = await callPromptGenerateSSE(postContent, imageUrl, (partial, detail) => {
       state.promptStreamText = partial || '';
-      state.promptDraft = mergePromptDraft(state.promptDraft, extractPromptDraftPartial(partial || ''));
+      if (!state.promptDraftEdited) {
+        state.promptDraft = mergePromptDraft(state.promptDraft, extractPromptDraftPartial(partial || ''));
+      }
       if (detail) {
         if (detail.promptRecordId) state.promptRecordId = detail.promptRecordId;
         const preview = detail.chunk || detail.raw || '';
@@ -5159,58 +5698,90 @@ async function generateTextPlan() {
     }
     state.promptDraft = mergeSelectedEnumConfigIntoPromptDraft(state.promptDraft);
     state.promptConfigResult = clonePromptDraft(state.promptDraft);
+    state.promptFramework = hasPromptFrameworkContent(state.promptParsed)
+      ? normalizePromptFramework(state.promptParsed)
+      : buildPromptFrameworkFallbackFromDraft(state.promptDraft, promptText);
+    let descriptionText = '';
+    let descriptionError = null;
     if (!state.promptRecordId) {
-      throw new Error('基础配置接口未返回 promptRecordId，无法继续生成描述 Prompt');
+      descriptionError = new Error('基础配置接口未返回 promptRecordId，已回退为本地可编辑提示词。');
+    } else if (!hasDescriptionStreamApi) {
+      descriptionError = new Error('未配置描述 Prompt 接口 URL，已回退为本地可编辑提示词。');
+    } else {
+      try {
+        showToast('正在补全标准提示词...', false);
+        descriptionText = await callDescriptionGenerateSSE(getDescriptionGenerateConfig(state.promptDraft), postContent, imageUrl, (partial, detail) => {
+          if (!state.finalPromptEdited) {
+            state.descriptionPrompt = partial || '';
+            state.promptStreamText = partial || '';
+          }
+          if (detail) {
+            const preview = detail.chunk || detail.raw || '';
+            state.promptStreamEvents.push({
+              time: new Date().toLocaleTimeString(),
+              type: detail.type || 'description',
+              preview: preview.length > 220 ? preview.slice(0, 220) + '...' : preview,
+            });
+            if (detail.raw) {
+              state.promptStreamRaw += (state.promptStreamRaw ? '\n\n' : '') + detail.raw;
+            }
+            if (state.promptStreamEvents.length > 80) {
+              state.promptStreamEvents = state.promptStreamEvents.slice(-80);
+            }
+          }
+          const debug = document.getElementById('ai-debug-json');
+          if (debug) debug.value = '=== Description Prompt Stream (partial) ===\n' + partial;
+          const debugWrap = document.getElementById('ai-debug');
+          if (debugWrap) debugWrap.style.display = 'block';
+          renderPromptCard();
+        });
+        if (!descriptionText) {
+          descriptionError = new Error('描述 Prompt 接口返回为空，已回退为本地可编辑提示词。');
+        }
+      } catch (err) {
+        descriptionError = err;
+      }
     }
 
-    showToast('第二步：正在生成描述 Prompt...', false);
-    const descriptionText = await callDescriptionGenerateSSE(getDescriptionGenerateConfig(state.promptDraft), postContent, imageUrl, (partial, detail) => {
-      state.descriptionPrompt = partial || '';
-      state.promptStreamText = partial || '';
-      if (detail) {
-        const preview = detail.chunk || detail.raw || '';
-        state.promptStreamEvents.push({
-          time: new Date().toLocaleTimeString(),
-          type: detail.type || 'description',
-          preview: preview.length > 220 ? preview.slice(0, 220) + '...' : preview,
-        });
-        if (detail.raw) {
-          state.promptStreamRaw += (state.promptStreamRaw ? '\n\n' : '') + detail.raw;
-        }
-        if (state.promptStreamEvents.length > 80) {
-          state.promptStreamEvents = state.promptStreamEvents.slice(-80);
-        }
-      }
-      const debug = document.getElementById('ai-debug-json');
-      if (debug) debug.value = '=== Description Prompt Stream (partial) ===\n' + partial;
-      const debugWrap = document.getElementById('ai-debug');
-      if (debugWrap) debugWrap.style.display = 'block';
-      renderPromptCard();
-    });
-    if (!descriptionText) throw new Error('描述 Prompt 接口返回为空');
-    state.descriptionPrompt = descriptionText;
-    state.promptStreamText = descriptionText;
+    const finalPromptText = String(descriptionText || '').trim() || buildPromptDraftCombined(state.promptDraft || createEmptyPromptDraft());
+    if (!String(state.promptFramework.normalized_prompt || '').trim()) {
+      state.promptFramework.normalized_prompt = finalPromptText;
+    } else if (String(descriptionText || '').trim()) {
+      state.promptFramework.normalized_prompt = finalPromptText;
+    }
+    if (!state.finalPromptEdited || !String(state.descriptionPrompt || '').trim()) {
+      state.descriptionPrompt = finalPromptText;
+      state.promptStreamText = finalPromptText;
+    }
     state.promptReady = true;
     state.promptLastUpdatedAt = Date.now();
     state.promptStreamStatus = 'success';
+    state.promptStreamError = descriptionError ? (descriptionError.message || '') : '';
+    rebuildPromptFromFramework(true);
     const debug = document.getElementById('ai-debug-json');
-    if (debug) debug.value = '=== Prompt Config ===\n' + promptText + '\n\n=== Description Prompt ===\n' + descriptionText;
+    if (debug) debug.value = '=== Prompt Config ===\n' + promptText + '\n\n=== Description Prompt ===\n' + finalPromptText + (descriptionError ? ('\n\n=== Description Stage Warning ===\n' + (descriptionError.message || '')) : '');
     const debugWrap = document.getElementById('ai-debug');
     if (debugWrap) debugWrap.style.display = 'block';
     if (state.textPlan && state.textPlan.meta) {
       state.textPlan.meta.prompt_generated_at = state.promptLastUpdatedAt;
-      state.textPlan.meta.prompt_source = 'prompt-generate + description-generate';
+      state.textPlan.meta.prompt_source = descriptionError ? 'prompt-generate + local-fallback' : 'prompt-generate + description-generate';
     }
     renderTextPlan();
     renderPromptCard();
+    seedOpsAssistantMessages();
     syncPlanGenerateButtonsVisibility();
-    showToast('两步提示词已生成，已自动切换到提示词预览。', true);
+    if (descriptionError) {
+      showToast('母版框架已生成，标准提示词已回退到本地汇总版。现在可以在左侧用 LLM 助手修改并生图。', false);
+    } else {
+      showToast('第一步已完成，已进入运营修改与真实数据接入阶段。', true);
+    }
   } catch (err) {
     state.promptReady = false;
     state.promptStreamText = '';
     state.promptStreamStatus = 'error';
     state.promptStreamError = err.message || '未知错误';
     state.promptParsed = null;
+    state.promptFramework = createEmptyPromptFramework();
     state.promptDraft = createEmptyPromptDraft();
     state.promptConfigResult = null;
     state.descriptionPrompt = '';
@@ -6842,7 +7413,43 @@ async function applyRegionEditFromInput() {
 }
 
 // ── Chat ──
-function fillChat() { return; }
+function getOpsSuggestionPrompts() {
+  if (!state.promptReady) {
+    return ['先上传参考图和正文', '生成提示词后再开始改业务内容', '生成后我来帮你接真实数据'];
+  }
+  return [
+    '把这条帖子改成更偏稳健理财的表达',
+    '接入 110022 的近1年收益、基金经理和风险等级',
+    '保留构图不变，只把视觉改得更财富号、更专业',
+    '把修改后的文案和数据汇总成最终生图提示词',
+  ];
+}
+
+function renderOpsChat() {
+  const thread = document.getElementById('ops-chat-thread');
+  const chips = document.getElementById('ops-chat-chips');
+  if (thread) {
+    const messages = state.opsChatMessages || [];
+    thread.classList.toggle('has-messages', !!messages.length);
+    thread.innerHTML = messages.map((msg) => `<div class="chat-msg ${msg.role === 'user' ? 'user' : 'ai'}">
+      <div class="msg-avatar">${msg.role === 'user' ? '你' : 'AI'}</div>
+      <div class="msg-bubble">${msg.isHtml ? msg.text : escapeHtml(msg.text)}</div>
+    </div>`).join('') + (state.opsChatBusy ? `<div class="chat-msg ai"><div class="msg-avatar">AI</div><div class="msg-bubble">正在整理运营修改和数据绑定...</div></div>` : '');
+    thread.scrollTop = thread.scrollHeight;
+  }
+  if (chips) {
+    chips.innerHTML = getOpsSuggestionPrompts().map(text => `<button class="chat-chip" type="button" onclick="fillChat('${escapeHtml(text)}')">${escapeHtml(text)}</button>`).join('');
+  }
+}
+
+function fillChat(prefill) {
+  const input = document.getElementById('ops-chat-input');
+  if (input) {
+    input.value = String(prefill || '').trim();
+    input.focus();
+  }
+}
+
 function streamBubbleText(bubble, text, speed) {
   if (!bubble) return;
   bubble.textContent = '';
@@ -6854,11 +7461,156 @@ function streamBubbleText(bubble, text, speed) {
   }, speed || 18);
 }
 function addChatMsg(text, role, isHtml) {
-  return null;
+  const message = {
+    text: String(text || '').trim(),
+    role: role === 'user' ? 'user' : 'ai',
+    isHtml: !!isHtml,
+  };
+  if (!message.text) return null;
+  state.opsChatMessages.push(message);
+  renderOpsChat();
+  return message;
+}
+
+function seedOpsAssistantMessages() {
+  if (state.opsChatMessages.length) return;
+  addChatMsg(
+    state.promptReady
+      ? '母版框架已经就绪。你可以直接告诉我改业务内容、接哪只基金的真实数据、或者想把视觉调成什么风格，我会把修改汇总进最终生图提示词。'
+      : '先在右侧完成“上传参考帖子 -> 生成母版框架”。生成后，我会在这里帮你做运营修改、接真实数据和重建生图提示词。',
+    'ai'
+  );
+}
+
+function extractFundCodesFromText(text) {
+  return Array.from(new Set((String(text || '').match(/\b\d{6}\b/g) || [])));
+}
+
+function buildOpsAssistantSystemPrompt() {
+  return `你是基金营销生图平台里的运营修改助手。你的任务是根据运营的自然语言指令，返回严格 JSON，帮助页面完成三类修改：
+1. 改业务内容
+2. 选真实数据
+3. 改视觉表达
+
+你只能返回 JSON，不要返回 markdown。
+
+输出结构：
+{
+  "assistant_reply":"给运营看的简短说明",
+  "field_updates":{"productName":"","theme":"","extra":""},
+  "copy_slots":{"headline":"","subheadline":"","body_copy":"","cta":""},
+  "visual_dna":{"color_style":"","mood":"","layout_change":""},
+  "constraints":{"must_keep":"","avoid":""},
+  "normalized_prompt":"如需整体重写母版提示词则填写，否则留空",
+  "data_request":{"fund_code":"","bind_slots":[]}
+}
+
+规则：
+- 没有明确要求时，不要重写所有字段。
+- 若用户提到基金代码，则写入 data_request.fund_code。
+- 若用户要求接入真实数据，bind_slots 尽量返回与收益、基金经理、风险、规模相关的槽位名。
+- JSON 中未修改的字段留空字符串、空对象或空数组。`;
+}
+
+async function callOpsAssistant(userText) {
+  const framework = getActivePromptFramework();
+  const contextPayload = {
+    framework,
+    dataBindings: state.fundDataBindings,
+    latestFundData: state.fundDataRecord,
+    finalPrompt: state.descriptionPrompt || framework.normalized_prompt || '',
+    currentConfig: getCurrentConfigSnapshot(),
+  };
+  const systemPrompt = buildOpsAssistantSystemPrompt();
+  const userMessage = `当前页面上下文：\n${JSON.stringify(contextPayload, null, 2)}\n\n运营要求：${userText}`;
+  return callLLM(systemPrompt, userMessage, buildReferenceContext());
+}
+
+async function applyOpsAssistantResult(result, fallbackUserText) {
+  const framework = getActivePromptFramework();
+  const updates = toPlainObject(result);
+  const fieldUpdates = toPlainObject(updates.field_updates);
+  const copySlots = toPlainObject(updates.copy_slots);
+  const visualDNA = toPlainObject(updates.visual_dna);
+  const constraints = toPlainObject(updates.constraints);
+  const dataRequest = toPlainObject(updates.data_request);
+
+  Object.assign(framework.copy_slots, Object.fromEntries(Object.entries(copySlots).filter(([, value]) => String(value || '').trim())));
+  Object.assign(framework.visual_dna, Object.fromEntries(Object.entries(visualDNA).filter(([, value]) => String(value || '').trim())));
+  Object.assign(framework.constraints, Object.fromEntries(Object.entries(constraints).filter(([, value]) => String(value || '').trim())));
+  if (String(updates.normalized_prompt || '').trim()) {
+    framework.normalized_prompt = String(updates.normalized_prompt).trim();
+  }
+
+  if (fieldUpdates.productName) {
+    setPromptConfigSelection('productName', fieldUpdates.productName);
+    framework.copy_slots.product_name = fieldUpdates.productName;
+  }
+  if (fieldUpdates.theme) {
+    setPromptConfigSelection('theme', fieldUpdates.theme);
+    framework.copy_slots.theme = fieldUpdates.theme;
+  }
+  if (fieldUpdates.extra) {
+    setPromptConfigSelection('extra', fieldUpdates.extra);
+    framework.copy_slots.business_note = fieldUpdates.extra;
+  }
+
+  state.promptFramework = framework;
+
+  const explicitCodes = extractFundCodesFromText(dataRequest.fund_code || fallbackUserText);
+  const targetCode = explicitCodes[0] || '';
+  if (targetCode) {
+    const record = await queryFundData(targetCode);
+    state.fundDataRecord = record;
+    renderFundDataTable(record);
+    const opsCodeInput = document.getElementById('ops-fund-code');
+    const ifindCodeInput = document.getElementById('ifind-code');
+    if (opsCodeInput) opsCodeInput.value = targetCode;
+    if (ifindCodeInput) ifindCodeInput.value = targetCode;
+    const bindSlots = Array.isArray(dataRequest.bind_slots) && dataRequest.bind_slots.length
+      ? dataRequest.bind_slots
+      : (String(fallbackUserText || '').includes('数据') ? Object.keys(framework.data_binding_slots || {}).slice(0, 4) : []);
+    bindSlots.forEach((slotKey) => {
+      const path = framework.data_binding_slots[slotKey];
+      if (!path) return;
+      const formatted = formatFundDataValue(slotKey, getValueByPath(record, path));
+      if (formatted) {
+        state.fundDataBindings[slotKey] = formatted;
+        if (framework.copy_slots[slotKey] !== undefined) framework.copy_slots[slotKey] = formatted;
+      }
+    });
+  }
+
+  rebuildPromptFromFramework(true);
+  renderPromptCard();
 }
 
 async function sendChat() {
-  return;
+  if (!state.promptReady) {
+    showToast('请先完成第一步，生成母版框架后再开始运营修改', false);
+    return;
+  }
+  const input = document.getElementById('ops-chat-input');
+  const text = String((input && input.value) || '').trim();
+  if (!text) {
+    showToast('请输入运营修改要求', false);
+    return;
+  }
+  addChatMsg(text, 'user');
+  if (input) input.value = '';
+  state.opsChatBusy = true;
+  renderOpsChat();
+  try {
+    const result = await callOpsAssistant(text);
+    await applyOpsAssistantResult(result, text);
+    addChatMsg(result.assistant_reply || '修改已应用到当前母版框架、真实数据绑定和最终生图提示词。', 'ai');
+  } catch (err) {
+    addChatMsg(`本次运营修改处理失败：${err.message || '未知错误'}`, 'ai');
+    showToast('运营助手处理失败：' + (err.message || '未知错误'), false);
+  } finally {
+    state.opsChatBusy = false;
+    renderOpsChat();
+  }
 }
 
 // ── Edit tools ──
@@ -6884,63 +7636,113 @@ function selectColor(el) { document.querySelectorAll('.color-dot').forEach(d => 
 function applyEdit() { if (!state.hasImage) { showToast('请先生成图片', false); return; } startGenerate(); }
 function undoHistory() { showToast('已撤销上一步操作', false); }
 
-// ── iFind ──
-function ifindSearch() {
-  const code = document.getElementById('ifind-code').value.trim();
-  if (!code) { showToast('请输入基金代码', false); return; }
-  loadCfg();
-  const tbody = document.getElementById('ifind-tbody');
-  const renderRow = (item) => {
-    tbody.innerHTML = `<tr>
-      <td>${item.code}</td><td style="max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${item.name}</td>
-      <td>${item.nav}</td>
-      <td style="color:${String(item.y1 || '').startsWith('+') ? '#10B981' : '#EF4444'}">${item.y1}</td>
-      <td style="color:${String(item.y3 || '').startsWith('+') ? '#10B981' : '#EF4444'}">${item.y3}</td>
-      <td>${item.scale}</td><td>${item.fee}</td>
-    </tr>`;
+// ── iFind / Real Data ──
+function normalizeFundDataRecord(row, fallbackCode) {
+  const source = toPlainObject(row);
+  return {
+    code: String(source.code || source.fundCode || fallbackCode || '').trim(),
+    name: String(source.name || source.fundName || source.productName || '-').trim(),
+    nav: String(source.nav || source.navValue || source.latestNav || '-').trim(),
+    y1: String(source.y1 || source.return1y || source.y1Return || source.performance1y || '-').trim(),
+    y3: String(source.y3 || source.return3y || source.y3Return || source.performance3y || '-').trim(),
+    scale: String(source.scale || source.aum || source.size || '-').trim(),
+    fee: String(source.fee || source.feeRate || source.managementFee || '-').trim(),
+    manager: String(source.manager || source.managerName || source.fundManager || '-').trim(),
+    risk: String(source.risk || source.riskLevel || source.risk_level || '-').trim(),
+    topHolding: String(source.topHolding || source.top_holding || source.holdingTop1 || source.top1Holding || '-').trim(),
+    navDate: String(source.navDate || source.dataDate || source.date || '-').trim(),
+    raw: source,
   };
+}
 
+async function queryFundData(code) {
+  const fundCode = String(code || '').trim();
+  if (!fundCode) throw new Error('请输入基金代码');
+  loadCfg();
   if (isProxyMode()) {
     const endpoint = buildProxyUrl(cfg.ifindPath || '/ifind/query');
-    fetch(endpoint, {
+    const resp = await fetch(endpoint, {
       method: 'POST',
       headers: { 'Content-Type':'application/json' },
-      body: JSON.stringify({ code }),
-    }).then(async (resp) => {
-      if (!resp.ok) {
-        const errText = await resp.text();
-        throw new Error(`iFind ${resp.status}: ${errText.slice(0, 180)}`);
-      }
-      const payload = await resp.json();
-      const row = payload && (payload.data || payload.result || payload.item || payload);
-      if (!row || !row.code) throw new Error('iFind 响应缺少 code 字段');
-      renderRow({
-        code: row.code,
-        name: row.name || row.fundName || '-',
-        nav: row.nav || row.navValue || '-',
-        y1: row.y1 || row.return1y || row.y1Return || '-',
-        y3: row.y3 || row.return3y || row.y3Return || '-',
-        scale: row.scale || row.aum || '-',
-        fee: row.fee || row.feeRate || '-',
-      });
-      showToast('iFind 接口数据已加载', true);
-    }).catch((err) => {
-      const fallback = IFIND_MOCK.find(f => f.code === code) || IFIND_MOCK[0];
-      renderRow(fallback);
-      showToast('iFind 接口失败，已回退 mock：' + err.message, false);
+      body: JSON.stringify({ code: fundCode }),
     });
+    if (!resp.ok) {
+      const errText = await resp.text();
+      throw new Error(`iFind ${resp.status}: ${errText.slice(0, 180)}`);
+    }
+    const payload = await resp.json();
+    const row = payload && (payload.data || payload.result || payload.item || payload);
+    return normalizeFundDataRecord(row, fundCode);
+  }
+  const fallback = IFIND_MOCK.find(f => f.code === fundCode) || IFIND_MOCK[0];
+  return normalizeFundDataRecord(fallback, fundCode);
+}
+
+function renderFundDataTable(record) {
+  const tbody = document.getElementById('ifind-tbody');
+  if (!tbody) return;
+  if (!record) {
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:12px 0;">搜索基金后显示数据</td></tr>`;
     return;
   }
-
-  const found = IFIND_MOCK.find(f => f.code === code) || IFIND_MOCK[0];
-  renderRow(found);
-  showToast('数据已加载（mock）', true);
+  tbody.innerHTML = `<tr>
+    <td>${escapeHtml(record.code || '-')}</td>
+    <td style="max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(record.name || '-')}</td>
+    <td>${escapeHtml(record.nav || '-')}</td>
+    <td style="color:${String(record.y1 || '').startsWith('+') ? '#10B981' : '#EF4444'}">${escapeHtml(record.y1 || '-')}</td>
+    <td style="color:${String(record.y3 || '').startsWith('+') ? '#10B981' : '#EF4444'}">${escapeHtml(record.y3 || '-')}</td>
+    <td>${escapeHtml(record.scale || '-')}</td>
+    <td>${escapeHtml(record.fee || '-')}</td>
+  </tr>`;
 }
-function ifindSync() { if (!state.hasImage) { showToast('请先生成图片', false); return; } showToast('数据已同步到图片', true); startGenerate(); }
+
+async function ifindSearch() {
+  const codeInput = document.getElementById('ifind-code');
+  const opsCodeInput = document.getElementById('ops-fund-code');
+  const code = String((opsCodeInput && opsCodeInput.value) || (codeInput && codeInput.value) || '').trim();
+  if (!code) {
+    showToast('请输入基金代码', false);
+    return;
+  }
+  try {
+    const record = await queryFundData(code);
+    state.fundDataRecord = record;
+    if (codeInput) codeInput.value = record.code || code;
+    if (opsCodeInput) opsCodeInput.value = record.code || code;
+    renderFundDataTable(record);
+    renderPromptCard();
+    showToast(isProxyMode() ? '真实数据已加载' : '数据已加载（mock）', true);
+  } catch (err) {
+    try {
+      const fallback = normalizeFundDataRecord(IFIND_MOCK.find(f => f.code === code) || IFIND_MOCK[0], code);
+      state.fundDataRecord = fallback;
+      renderFundDataTable(fallback);
+      renderPromptCard();
+    } catch (_) {}
+    showToast('数据查询失败：' + (err.message || '未知错误'), false);
+  }
+}
+
+function ifindSync() {
+  if (!state.fundDataRecord) {
+    showToast('请先查询真实数据', false);
+    return;
+  }
+  applyFundDataSelectionBySlots(Object.keys(getActivePromptFramework().data_binding_slots || {}));
+}
 
 // ── Export ──
 async function exportCurrent() {
   if (!state.hasImage) { showToast('请先生成图片', false); return; }
+  if (isFileProtocolRuntime()) {
+    const mc = document.getElementById('main-canvas');
+    const a = document.createElement('a');
+    a.download = 'fundcanvas_export.png';
+    a.href = mc.toDataURL('image/png');
+    a.click();
+    showToast('当前为 file:// 打开，已使用兼容导出（不含文字层）。建议用本地服务器启动。', false);
+    return;
+  }
   // Prefer html2canvas (captures text layers too)
   if (typeof html2canvas !== 'undefined') {
     showToast('导出中...', false);
@@ -7340,7 +8142,7 @@ function loadFuguoDemo() {
 function _drawDemoBg(mc) {
   const ctx = mc.getContext('2d');
   const img = new Image();
-  img.crossOrigin = 'anonymous';
+  if (!isFileProtocolRuntime()) img.crossOrigin = 'anonymous';
   img.onload = () => ctx.drawImage(img, 0, 0, mc.width, mc.height);
   img.onerror = () => {
     const [w, h] = [mc.width, mc.height];
@@ -7887,25 +8689,50 @@ async function callDescriptionGenerateSSE(config, postContent, imageUrl, onParti
   console.debug('Description Prompt request payload', payload);
   console.debug('Description Prompt request payload JSON\n' + JSON.stringify(payload, null, 2));
 
-  const resp = await fetch(endpoint, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'text/event-stream',
-    },
-    body: JSON.stringify(payload),
-  });
-
-  if (!resp.ok || !resp.body) {
-    const text = await resp.text();
-    console.warn('Description Prompt request failed', {
-      status: resp.status,
-      config: payload.config,
-      hasPostContent: !!payload.post_content,
-      hasImageUrl: !!payload.image_url,
-      payloadJson: JSON.stringify(payload, null, 2),
+  const requestOnce = async (bodyPayload) => {
+    const resp = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'text/event-stream',
+      },
+      body: JSON.stringify(bodyPayload),
     });
-    throw new Error(`描述 Prompt 接口 ${resp.status}: ${summarizeApiErrorText(text)}`);
+    if (!resp.ok || !resp.body) {
+      const text = await resp.text();
+      console.warn('Description Prompt request failed', {
+        status: resp.status,
+        config: bodyPayload.config,
+        hasPostContent: !!bodyPayload.post_content,
+        hasImageUrl: !!bodyPayload.image_url,
+        payloadJson: JSON.stringify(bodyPayload, null, 2),
+      });
+      throw new Error(`描述 Prompt 接口 ${resp.status}: ${summarizeApiErrorText(text)}`);
+    }
+    return resp;
+  };
+
+  let resp;
+  try {
+    resp = await requestOnce(payload);
+  } catch (firstErr) {
+    // 自动精简重试：仅保留后端最小必需字段，减少后端解析异常概率。
+    const slimPayload = {
+      timestamp: Date.now(),
+      channel: payload.channel,
+      version: payload.version,
+      sign: payload.sign,
+      promptRecordId: payload.promptRecordId,
+      config: {
+        typeName: payload.config.typeName,
+        platform: payload.config.platform,
+        ...(payload.config.typeOption ? { typeOption: payload.config.typeOption } : {}),
+      },
+      post_content: payload.image_url ? '' : (payload.post_content || ''),
+      image_url: payload.image_url || '',
+    };
+    console.warn('Description Prompt retry with slim payload', slimPayload);
+    resp = await requestOnce(slimPayload);
   }
 
   const reader = resp.body.getReader();
@@ -8382,12 +9209,16 @@ async function callImgEditAPI(prompt, imageBlob, maskBlob) {
 // ════════════════════════════════════════════════
 // COMPOSE AI — draw final image directly on canvas
 // ════════════════════════════════════════════════
-// 通过 fetch 下载图片为 blob URL，绕开 file:// 下的 CORS 限制
+// 通过 fetch 下载图片为 blob URL；在 file:// 下也先尝试，失败后再降级。
 async function fetchImageAsBlobUrl(url) {
   const raw = String(url || '').trim();
   if (!raw) return raw;
   if (/^(data:|blob:)/i.test(raw)) return raw;
+  const fileRuntime = isFileProtocolRuntime();
+  const isLocalServer = /^https?:\/\/localhost(:\d+)?/i.test(location.href);
   const attempts = [
+    // 本地服务模式：优先走本地 Node 代理，彻底绕开浏览器 CORS 限制
+    ...(isLocalServer ? [() => fetch('/proxy?url=' + encodeURIComponent(raw), { credentials: 'omit' })] : []),
     () => fetch(raw, { mode: 'cors', credentials: 'omit' }),
     () => fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent(raw), { credentials: 'omit' }),
     () => fetch('https://images.weserv.nl/?url=' + encodeURIComponent(raw), { credentials: 'omit' }),
@@ -8400,12 +9231,52 @@ async function fetchImageAsBlobUrl(url) {
       const blob = await resp.blob();
       return URL.createObjectURL(blob);
     } catch (e) {
-      console.warn(`[fetchImageAsBlobUrl] 尝试${i + 1}失败`, e.message);
+      console.warn(`[fetchImageAsBlobUrl] 尝试${i + 1}失败`, e && e.message ? e.message : e);
     }
   }
-  // 所有代理均失败：返回特殊标记，由调用方降级处理
-  console.warn('[fetchImageAsBlobUrl] 所有方式均失败，降级展示', raw);
+  // 所有方式均失败：返回特殊标记，由调用方降级处理。
+  if (fileRuntime) {
+    console.warn('[fetchImageAsBlobUrl] file:// 模式下全部失败，建议使用本地服务运行（如 npx serve .）', raw);
+  } else {
+    console.warn('[fetchImageAsBlobUrl] 所有方式均失败，降级展示', raw);
+  }
   return '__fallback__:' + raw;
+}
+
+function toggleFallbackAction(url) {
+  const dock = document.getElementById('cors-fallback-action');
+  if (!dock) return;
+  state.fallbackImageUrl = String(url || '').trim();
+  dock.style.display = state.fallbackImageUrl ? 'flex' : 'none';
+}
+
+async function copyFallbackImageUrl() {
+  const url = String(state.fallbackImageUrl || '').trim();
+  if (!url) {
+    showToast('当前没有可复制的结果链接', false);
+    return;
+  }
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(url);
+      showToast('结果 URL 已复制', true);
+      return;
+    }
+    const input = document.createElement('textarea');
+    input.value = url;
+    input.setAttribute('readonly', 'readonly');
+    input.style.position = 'fixed';
+    input.style.left = '-9999px';
+    document.body.appendChild(input);
+    input.select();
+    const ok = document.execCommand('copy');
+    document.body.removeChild(input);
+    if (ok) {
+      showToast('结果 URL 已复制', true);
+      return;
+    }
+  } catch (_) {}
+  window.prompt('请复制以下结果 URL', url);
 }
 
 async function composeAI(imageUrl, w, h, options) {
@@ -8426,6 +9297,7 @@ async function composeAI(imageUrl, w, h, options) {
   document.getElementById('canvas-info').textContent = w + ' × ' + h + ' px';
 
   const ctx = mc.getContext('2d');
+  toggleFallbackAction('');
   // 通过 fetch blob 方式绕开 file:// origin 下的 CORS 限制
   const blobUrl = await fetchImageAsBlobUrl(imageUrl);
   if (blobUrl && !blobUrl.startsWith('__fallback__:')) {
@@ -8449,6 +9321,7 @@ async function composeAI(imageUrl, w, h, options) {
     }
     overlay.src = originalUrl;
     overlay.style.display = 'block';
+    toggleFallbackAction(originalUrl);
     // 显示提示
     showToast('图片已生成，因 CDN 跨域限制无法写入画布，已覆盖显示。右键图片可另存为。', true);
   } else {
@@ -8494,6 +9367,10 @@ function initWorkbench() {
   updateRefEntryStatus();
   renderReferenceStrip();
   renderPlanStageUI();
+  renderFundDataTable(state.fundDataRecord);
+  seedOpsAssistantMessages();
+  renderOpsChat();
+  renderPromptCard();
   if (state.historyData.length) {
     const latest = state.historyData[state.historyData.length - 1];
     updateCurrentProjectRecord('', latest && latest.dataUrl ? latest.dataUrl : '');
@@ -8502,6 +9379,9 @@ function initWorkbench() {
   setCanvasPreviewMode('result');
   syncPlanGenerateButtonsVisibility();
   ensureReferenceRequired();
+  if (isFileProtocolRuntime()) {
+    showToast('当前通过 file:// 打开，浏览器会限制部分能力。请用 npx serve . 后通过 http://localhost 访问。', false);
+  }
 }
 
 initWorkbench();
