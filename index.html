@@ -11274,10 +11274,10 @@ async function fetchImageAsBlobUrl(url) {
   if (!raw) return raw;
   if (/^(data:|blob:)/i.test(raw)) return raw;
   const fileRuntime = isFileProtocolRuntime();
-  const isLocalServer = /^https?:\/\/localhost(:\d+)?/i.test(location.href);
+  // 只要通过 HTTP/HTTPS 访问（本地或部署），都优先走同源 /proxy 端点（server.js 内置代理）
+  const isHttpServed = /^https?:\/\//i.test(location.href);
   const attempts = [
-    // 本地服务模式：优先走本地 Node 代理，彻底绕开浏览器 CORS 限制
-    ...(isLocalServer ? [() => fetch('/proxy?url=' + encodeURIComponent(raw), { credentials: 'omit' })] : []),
+    ...(isHttpServed ? [() => fetch('/proxy?url=' + encodeURIComponent(raw), { credentials: 'omit' })] : []),
     () => fetch(raw, { mode: 'cors', credentials: 'omit' }),
     () => fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent(raw), { credentials: 'omit' }),
     () => fetch('https://images.weserv.nl/?url=' + encodeURIComponent(raw), { credentials: 'omit' }),
