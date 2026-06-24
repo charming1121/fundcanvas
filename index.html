@@ -1797,6 +1797,7 @@ const state = {
   promptEnumsError:'',
   promptEnumsPromise:null,
   promptPreviewExpanded:false,
+  lastPromptModificationDiff:null,
   entityCompany:'',
   entityProduct:'',
   entityBindingFeedback:'',
@@ -6540,6 +6541,9 @@ function renderPromptCard() {
       : (state.descriptionPromptStatus === 'generating'
           ? `<div class="module-loading-state" style="min-height:220px;margin-top:10px;"><div class="module-loading-spinner"></div><div class="module-loading-title">提示词生成中</div><div class="module-loading-desc">系统正在基于前面的 config 生成完整提示词，完成后这里会直接展示全文。</div></div>`
           : `<div style="font-size:12px;color:var(--text-sub);margin-top:10px;line-height:1.8;">请先完成前面的 config 检查，然后点击下方“生成提示词”。生成后，这里会展示完整 prompt，左侧 LLM 助手也会基于这段完整提示词继续修改。</div>`);
+    const promptDiffCard = state.promptReady && state.lastPromptModificationDiff
+      ? renderPromptModificationDiffCard(state.lastPromptModificationDiff)
+      : '';
 
     const promptStepActions = !state.promptReady
       ? `<div class="export-row" style="margin-top:10px;"><button class="apply-btn" style="flex:1;margin-top:0;" type="button" onclick="generateDescriptionPrompt()" ${state.descriptionPromptStatus === 'generating' ? 'disabled' : ''}>${state.descriptionPromptStatus === 'generating' ? '生成提示词中...' : '生成提示词'}</button></div>`
@@ -6550,6 +6554,7 @@ function renderPromptCard() {
       <div style="font-size:12px;color:var(--text-sub);line-height:1.7;margin:8px 0 10px;">这里展示完整提示词。你可以对照全文查看结果，随后通过左侧 LLM 助手继续做局部修改。</div>
       ${referenceChoiceCard}
       ${promptStepBody}
+      ${promptDiffCard}
       ${promptStepActions}
     </div>`;
   })();
@@ -6893,6 +6898,7 @@ async function generateTextPlan() {
     state.descriptionRecordId = '';
     state.descriptionPrompt = '';
     state.frameworkPromptPreview = '';
+    state.lastPromptModificationDiff = null;
     state.promptDraftEdited = false;
     state.finalPromptEdited = false;
     state.opsSummaryText = '';
@@ -7027,6 +7033,7 @@ async function generateDescriptionPrompt() {
     state.descriptionPromptError = '';
     state.descriptionPrompt = '';
     state.descriptionRecordId = '';
+    state.lastPromptModificationDiff = null;
     state.finalPromptEdited = false;
     ensurePromptEditStepState();
     state.promptEditSteps.current = 'prompt';
@@ -8792,11 +8799,13 @@ async function sendChat() {
   state.opsChatBusy = true;
   renderOpsChat();
   try {
+    const beforePromptText = String(state.descriptionPrompt || state.frameworkPromptPreview || '').trim();
     const result = await callPromptModification(text);
-    const finalPromptText = extractPromptModificationPrompt(result, state.descriptionPrompt || state.frameworkPromptPreview || '');
+    const finalPromptText = extractPromptModificationPrompt(result, beforePromptText);
     if (!finalPromptText) {
       throw new Error('提示词修改接口未返回可用内容');
     }
+    state.lastPromptModificationDiff = buildPromptModificationDiffData(beforePromptText, finalPromptText, result);
     state.descriptionPrompt = finalPromptText;
     state.finalPromptEdited = true;
     state.promptReady = true;
@@ -8810,7 +8819,7 @@ async function sendChat() {
     renderPromptCard();
     syncPlanGenerateButtonsVisibility();
     const debug = document.getElementById('ai-debug-json');
-    if (debug) debug.value = '=== Prompt Modification Response ===\n' + JSON.stringify(result, null, 2) + '\n\n=== Current Prompt ===\n' + finalPromptText;
+    if (debug) debug.value = '=== Prompt Modification Response ===\n' + JSON.stringify(result, null, 2) + '\n\n=== Replacement Pairs ===\n' + JSON.stringify(extractPromptModificationReplacementPairs(result), null, 2) + '\n\n=== Prompt Before ===\n' + beforePromptText + '\n\n=== Prompt After ===\n' + finalPromptText;
     const debugWrap = document.getElementById('ai-debug');
     if (debugWrap) debugWrap.style.display = 'block';
     addChatMsg(extractPromptModificationReply(result) || '修改已应用到最终提示词。', 'ai');
@@ -9756,42 +9765,300 @@ function extractDescriptionRecordIdFromPayload(payload) {
   ).trim();
 }
 
+function normalizePromptModificationItem(item) {
+  const source = item && typeof item === 'object' ? item : {};
+  return {
+    sectionName: String(source.modifiedSectionName || source.modified_section_name || '').trim(),
+    sectionPrompt: String(source.modifiedSectionPrompt || source.modified_section_prompt || '').trim(),
+    description: String(source.modificationDescription || source.modification_description || '').trim(),
+  };
+}
+
+function extractPromptModificationItems(payload) {
+  if (!payload || typeof payload !== 'object') return [];
+  const rawItems = [];
+  const candidates = [
+    payload.modifications,
+    payload.result?.modifications,
+    payload.data?.modifications,
+  ];
+  candidates.forEach((list) => {
+    if (Array.isArray(list)) rawItems.push(...list);
+  });
+  if (rawItems.length) {
+    return rawItems.map(normalizePromptModificationItem).filter(item => item.sectionName || item.sectionPrompt || item.description);
+  }
+  const fallbackItem = normalizePromptModificationItem(payload);
+  if (fallbackItem.sectionName || fallbackItem.sectionPrompt || fallbackItem.description) {
+    return [fallbackItem];
+  }
+  const resultFallbackItem = normalizePromptModificationItem(payload.result);
+  if (resultFallbackItem.sectionName || resultFallbackItem.sectionPrompt || resultFallbackItem.description) {
+    return [resultFallbackItem];
+  }
+  const dataFallbackItem = normalizePromptModificationItem(payload.data);
+  if (dataFallbackItem.sectionName || dataFallbackItem.sectionPrompt || dataFallbackItem.description) {
+    return [dataFallbackItem];
+  }
+  return [];
+}
+
+function escapeRegExp(text) {
+  return String(text || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function getPromptModificationSectionAliases(sectionName) {
+  const name = String(sectionName || '').trim();
+  if (!name) return [];
+  const aliasMap = {
+    '整体定位': ['整体定位'],
+    '视觉风格': ['视觉风格', '统一视觉风格', '视觉框架'],
+    '关键元素': ['关键元素', '核心元素'],
+    '文案框架': ['文案框架', '排版规范'],
+  };
+  const aliases = aliasMap[name] || [name];
+  return Array.from(new Set(aliases.filter(Boolean)));
+}
+
+function extractPromptModificationReplacementPairs(payload) {
+  const items = extractPromptModificationItems(payload);
+  const unique = new Set();
+  const pairs = [];
+  const pushPair = (fromText, toText) => {
+    const from = String(fromText || '').replace(/^原有/, '').trim();
+    const to = String(toText || '').trim();
+    if (!from || !to || from === to) return;
+    const key = `${from}=>${to}`;
+    if (unique.has(key)) return;
+    unique.add(key);
+    pairs.push({ from, to });
+  };
+  items.forEach((item) => {
+    const description = String(item.description || '').trim();
+    const sectionPrompt = String(item.sectionPrompt || '').trim();
+
+    const brandMatch = description.match(/品牌从([^，。；、\s]{1,16})调整为([^，。；、\s]{1,16})/);
+    if (brandMatch) {
+      pushPair(brandMatch[1], brandMatch[2]);
+      pushPair(`${brandMatch[1]}礼品券`, `${brandMatch[2]}礼品券`);
+      pushPair(`${brandMatch[1]}联想色系`, `${brandMatch[2]}联想色系`);
+    }
+
+    const ipMatch = description.match(/将原有([^，。；]{1,24}?)(?:IP|ip|形象)?替换为([^，。；]{1,32}?)(?:形象)?(?:，|。|；|$)/);
+    if (ipMatch) {
+      pushPair(ipMatch[1], ipMatch[2]);
+      pushPair(`${ipMatch[1]}IP`, `${ipMatch[2]}IP形象`);
+      pushPair(`${ipMatch[1]}形象`, `${ipMatch[2]}形象`);
+      pushPair('可爱卡通人物', `${ipMatch[2]}IP形象`);
+      pushPair('卡通人物', `${ipMatch[2]}IP形象`);
+      pushPair('人物IP', `${ipMatch[2]}IP形象`);
+    }
+
+    const quotedReplaceRegex = /“([^”]{1,60})”[^“”\n]{0,30}(?:均改为|改为|替换为|调整为)“([^”]{1,80})”/g;
+    let quotedMatch;
+    while ((quotedMatch = quotedReplaceRegex.exec(sectionPrompt)) !== null) {
+      pushPair(quotedMatch[1], quotedMatch[2]);
+    }
+
+    const genericPatterns = [
+      /从([^，。；;\n]{1,30}?)调整为([^，。；;\n]{1,40}?)(?:，|。|；|;|\n|$)/g,
+      /将原有([^，。；;\n]{1,30}?)调整为([^，。；;\n]{1,40}?)(?:，|。|；|;|\n|$)/g,
+      /将原有([^，。；;\n]{1,30}?)替换为([^，。；;\n]{1,40}?)(?:，|。|；|;|\n|$)/g,
+      /将([^，。；;\n]{1,30}?)替换为([^，。；;\n]{1,40}?)(?:，|。|；|;|\n|$)/g,
+    ];
+    [description, sectionPrompt].forEach((text) => {
+      const source = String(text || '');
+      if (!source) return;
+      genericPatterns.forEach((pattern) => {
+        pattern.lastIndex = 0;
+        let match;
+        while ((match = pattern.exec(source)) !== null) {
+          pushPair(match[1], match[2]);
+        }
+      });
+    });
+  });
+  return pairs.sort((left, right) => right.from.length - left.from.length);
+}
+
+function applyPromptModificationReplacementPairs(basePrompt, payload) {
+  let output = String(basePrompt || '');
+  extractPromptModificationReplacementPairs(payload).forEach(({ from, to }) => {
+    const variants = Array.from(new Set([
+      from,
+      from.replace(/^原有/, '').trim(),
+      from.replace(/IP形象|人物IP|卡通人物IP/g, '卡通人物').trim(),
+      from.replace(/可爱的?/g, '').trim(),
+    ].filter(Boolean)));
+    variants.forEach((variant) => {
+      if (!variant) return;
+      output = output.replace(new RegExp(escapeRegExp(variant), 'g'), to);
+    });
+  });
+  return output;
+}
+
+function countPromptOccurrences(text, keyword) {
+  const source = String(text || '');
+  const target = String(keyword || '');
+  if (!source || !target) return 0;
+  return source.split(target).length - 1;
+}
+
+function extractPromptSectionText(promptText, sectionName, fallbackText) {
+  const source = String(promptText || '').trim();
+  if (!source) return String(fallbackText || '').trim();
+  const sectionRange = findPromptSectionRange(source, sectionName);
+  if (!sectionRange) return String(fallbackText || '').trim();
+  return source.slice(sectionRange.start, sectionRange.end).trim();
+}
+
+function buildPromptModificationDiffData(beforePrompt, afterPrompt, payload) {
+  const beforeText = String(beforePrompt || '').trim();
+  const afterText = String(afterPrompt || '').trim();
+  const items = extractPromptModificationItems(payload);
+  const replacementPairs = extractPromptModificationReplacementPairs(payload)
+    .map((pair) => ({
+      from: pair.from,
+      to: pair.to,
+      beforeCount: countPromptOccurrences(beforeText, pair.from),
+      afterOldCount: countPromptOccurrences(afterText, pair.from),
+      afterNewCount: countPromptOccurrences(afterText, pair.to),
+    }))
+    .filter((pair) => pair.beforeCount || pair.afterOldCount || pair.afterNewCount);
+  const sections = items.map((item, index) => ({
+    title: item.sectionName || `修改片段 ${index + 1}`,
+    description: item.description || '',
+    before: extractPromptSectionText(beforeText, item.sectionName, ''),
+    after: extractPromptSectionText(afterText, item.sectionName, item.sectionPrompt || ''),
+  })).filter((item) => item.before || item.after || item.description);
+  return {
+    before: beforeText,
+    after: afterText,
+    replacementPairs,
+    sections,
+    changedAt: Date.now(),
+  };
+}
+
+function renderPromptModificationDiffCard(diff) {
+  if (!diff || typeof diff !== 'object') return '';
+  const replacementPairs = Array.isArray(diff.replacementPairs) ? diff.replacementPairs : [];
+  const sections = Array.isArray(diff.sections) ? diff.sections : [];
+  const changedTime = diff.changedAt ? new Date(diff.changedAt).toLocaleTimeString() : '';
+  const replacementHtml = replacementPairs.length
+    ? `<div style="display:grid;gap:8px;margin-top:10px;">${replacementPairs.map((pair) => `<div style="padding:10px;border:1px solid var(--border);border-radius:10px;background:#fff;">
+        <div style="font-size:12px;font-weight:600;color:var(--text-main);">${escapeHtml(pair.from)} → ${escapeHtml(pair.to)}</div>
+        <div style="font-size:11px;color:var(--text-sub);line-height:1.7;margin-top:4px;">修改前旧词 ${pair.beforeCount} 次，修改后旧词 ${pair.afterOldCount} 次，新词 ${pair.afterNewCount} 次</div>
+      </div>`).join('')}</div>`
+    : `<div style="font-size:12px;color:var(--text-sub);line-height:1.7;margin-top:10px;">本次没有识别到可统计的全局替换对。</div>`;
+  const sectionHtml = sections.length
+    ? sections.map((item) => `<div style="padding:12px;border:1px solid var(--border);border-radius:10px;background:#fff;margin-top:10px;">
+        <div style="font-size:12px;font-weight:700;color:var(--text-main);">${escapeHtml(item.title)}</div>
+        ${item.description ? `<div style="font-size:11px;color:var(--text-sub);line-height:1.7;margin-top:4px;">${escapeHtml(item.description)}</div>` : ''}
+        <div style="display:grid;gap:10px;margin-top:10px;">
+          <div>
+            <div style="font-size:11px;font-weight:600;color:var(--text-sub);margin-bottom:4px;">修改前</div>
+            <textarea class="plan-edit-textarea" readonly style="min-height:120px;color:var(--text-sub);">${escapeHtml(item.before || '未命中原始段落')}</textarea>
+          </div>
+          <div>
+            <div style="font-size:11px;font-weight:600;color:var(--text-sub);margin-bottom:4px;">修改后</div>
+            <textarea class="plan-edit-textarea" readonly style="min-height:120px;color:var(--text-main);">${escapeHtml(item.after || '未生成新段落')}</textarea>
+          </div>
+        </div>
+      </div>`).join('')
+    : `<div style="font-size:12px;color:var(--text-sub);line-height:1.7;margin-top:10px;">本次没有可展示的 section 级差异。</div>`;
+  return `<div class="param-card" style="margin-top:10px;margin-bottom:0;">
+    <div class="param-card-title">最近一次提示词修改对比</div>
+    <div style="font-size:12px;color:var(--text-sub);line-height:1.7;margin-top:6px;">${changedTime ? `更新时间：${escapeHtml(changedTime)}。` : ''}这里会展示本次左侧 LLM 修改对右下角最终提示词产生的直接变化。</div>
+    <div style="font-size:12px;font-weight:600;color:var(--text-main);margin-top:12px;">全局替换概览</div>
+    ${replacementHtml}
+    <div style="font-size:12px;font-weight:600;color:var(--text-main);margin-top:14px;">Section 对比</div>
+    ${sectionHtml}
+  </div>`;
+}
+
+function findPromptSectionRange(basePrompt, sectionName) {
+  const base = String(basePrompt || '');
+  const aliases = getPromptModificationSectionAliases(sectionName);
+  const headingCandidates = aliases.flatMap((name) => [`【${name}】`, `${name}：`, `${name}:`]);
+  let bestStart = -1;
+  let matchedHeading = '';
+  headingCandidates.forEach((heading) => {
+    const index = base.indexOf(heading);
+    if (index >= 0 && (bestStart < 0 || index < bestStart)) {
+      bestStart = index;
+      matchedHeading = heading;
+    }
+  });
+  if (bestStart < 0) return null;
+  const nextMarkers = [
+    '\n\n【',
+    '\n\n第一步：',
+    '\n\n第二步：',
+    '\n\n第三步：',
+    '\n\n待确认项',
+    '\n\n运营修改汇总：',
+  ];
+  const startSearch = bestStart + matchedHeading.length;
+  let end = base.length;
+  nextMarkers.forEach((marker) => {
+    const markerIndex = base.indexOf(marker, startSearch);
+    if (markerIndex >= 0 && markerIndex < end) end = markerIndex;
+  });
+  return { start: bestStart, end };
+}
+
+function insertPromptModificationPatch(basePrompt, patchText) {
+  const base = String(basePrompt || '').trim();
+  const patch = String(patchText || '').trim();
+  if (!patch) return base;
+  if (!base) return patch;
+  const anchors = [
+    '\n\n【合规要求】',
+    '\n\n可直接用于图片生成的整合版 Prompt：',
+    '\n\n第一步：基础要素',
+    '\n\n第二步：视觉框架',
+    '\n\n第三步：叙述逻辑',
+    '\n\n待确认项',
+    '\n\n运营修改汇总：',
+  ];
+  let insertAt = base.length;
+  anchors.forEach((anchor) => {
+    const index = base.indexOf(anchor);
+    if (index >= 0 && index < insertAt) insertAt = index;
+  });
+  if (insertAt === base.length) return `${base}\n\n${patch}`.trim();
+  return `${base.slice(0, insertAt).trim()}\n\n${patch}\n\n${base.slice(insertAt).trim()}`.trim();
+}
+
 function extractPromptModificationSectionName(payload) {
-  if (!payload || typeof payload !== 'object') return '';
-  return String(
-    payload.modifiedSectionName ||
-    payload.modified_section_name ||
-    payload.result?.modifiedSectionName ||
-    payload.result?.modified_section_name ||
-    payload.data?.modifiedSectionName ||
-    payload.data?.modified_section_name ||
-    ''
-  ).trim();
+  return extractPromptModificationItems(payload)[0]?.sectionName || '';
 }
 
 function extractPromptModificationSectionPrompt(payload) {
-  if (!payload || typeof payload !== 'object') return '';
-  return String(
-    payload.modifiedSectionPrompt ||
-    payload.modified_section_prompt ||
-    payload.result?.modifiedSectionPrompt ||
-    payload.result?.modified_section_prompt ||
-    payload.data?.modifiedSectionPrompt ||
-    payload.data?.modified_section_prompt ||
-    ''
-  ).trim();
+  return extractPromptModificationItems(payload)[0]?.sectionPrompt || '';
 }
 
 function extractPromptModificationReply(payload) {
   if (!payload || typeof payload !== 'object') return '';
-  const sectionName = extractPromptModificationSectionName(payload);
+  const items = extractPromptModificationItems(payload);
+  const sectionName = items[0]?.sectionName || '';
+  const itemDescriptions = items
+    .map(item => item.description || (item.sectionName ? `已更新“${item.sectionName}”相关提示词。` : ''))
+    .filter(Boolean);
+  if (itemDescriptions.length === 1) return itemDescriptions[0];
+  if (itemDescriptions.length > 1) return itemDescriptions.map((text, index) => `${index + 1}. ${text}`).join('\n');
   const description = String(
     payload.modificationDescription ||
     payload.modification_description ||
+    payload.msg ||
     payload.assistantReply ||
     payload.assistant_reply ||
+    payload.result?.msg ||
     payload.result?.modificationDescription ||
     payload.result?.modification_description ||
+    payload.data?.msg ||
     payload.data?.modificationDescription ||
     payload.data?.modification_description ||
     ''
@@ -9817,16 +10084,11 @@ function mergePromptModificationFallback(basePrompt, sectionName, sectionPrompt)
   const safeSectionName = String(sectionName || '').trim();
   if (!base) return patch;
   if (safeSectionName) {
-    const heading = `${safeSectionName}：`;
-    const headingIndex = base.indexOf(heading);
-    if (headingIndex >= 0) {
-      const nextHeadingIndex = base.indexOf('\n\n', headingIndex + heading.length);
-      if (nextHeadingIndex > headingIndex) {
-        return `${base.slice(0, headingIndex)}${heading}\n${patch}${base.slice(nextHeadingIndex)}`.trim();
-      }
-      return `${base.slice(0, headingIndex)}${heading}\n${patch}`.trim();
+    const sectionRange = findPromptSectionRange(base, safeSectionName);
+    if (sectionRange) {
+      return `${base.slice(0, sectionRange.start)}${patch}${base.slice(sectionRange.end)}`.trim();
     }
-    return `${base}\n\n${heading}\n${patch}`.trim();
+    return insertPromptModificationPatch(base, patch);
   }
   return `${base}\n\n补充修改：\n${patch}`.trim();
 }
@@ -9834,19 +10096,26 @@ function mergePromptModificationFallback(basePrompt, sectionName, sectionPrompt)
 function extractPromptModificationPrompt(payload, fallbackPrompt) {
   const fullPrompt = extractDescriptionPromptFromPayload(payload);
   if (fullPrompt) return fullPrompt;
-  const sectionName = extractPromptModificationSectionName(payload);
-  const sectionPrompt = extractPromptModificationSectionPrompt(payload);
-  const mergedPrompt = mergePromptModificationFallback(
-    fallbackPrompt,
-    sectionName,
-    sectionPrompt
-  );
-  if (mergedPrompt !== String(fallbackPrompt || '').trim()) {
-    return mergedPrompt;
+  const items = extractPromptModificationItems(payload);
+  if (items.length) {
+    const baseText = String(fallbackPrompt || '').trim();
+    let mergedPrompt = applyPromptModificationReplacementPairs(baseText, payload);
+    const globallyReplaced = mergedPrompt !== baseText;
+    let hasMerged = false;
+    items.forEach((item) => {
+      const nextPrompt = mergePromptModificationFallback(mergedPrompt, item.sectionName, item.sectionPrompt);
+      if (nextPrompt !== mergedPrompt) {
+        mergedPrompt = nextPrompt;
+        hasMerged = true;
+      }
+    });
+    if (hasMerged || globallyReplaced) {
+      return mergedPrompt;
+    }
   }
   return buildPromptModificationInstructionFallback(
     fallbackPrompt,
-    sectionName,
+    extractPromptModificationSectionName(payload),
     extractPromptModificationReply(payload)
   );
 }
