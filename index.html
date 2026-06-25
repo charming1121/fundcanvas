@@ -6525,7 +6525,7 @@ function renderPromptCard() {
     </div>`;
     }
 
-    const referenceChoiceCard = `<div style="margin-top:10px;padding:12px;border:1px solid var(--border);border-radius:10px;background:var(--bg);">
+    const referenceChoiceCard = state.promptReady ? `<div style="margin-top:10px;padding:12px;border:1px solid var(--border);border-radius:10px;background:var(--bg);">
       <div style="font-size:12px;font-weight:600;color:var(--text-main);">本次生图参考图确认</div>
       <div style="font-size:12px;color:var(--text-sub);line-height:1.7;margin-top:6px;">${generationReferenceState.hasImage
         ? (generationReferenceState.includeImage
@@ -6534,7 +6534,7 @@ function renderPromptCard() {
         : '当前没有可传给生图接口的图片输入。'}</div>
       ${generationReferenceState.displayValue ? `<textarea class="plan-edit-textarea" readonly style="min-height:${generationReferenceState.sourceType === 'url' ? '72px' : '88px'};margin-top:8px;color:var(--text-sub);">${escapeHtml(generationReferenceState.displayValue)}</textarea>` : ''}
       ${generationReferenceState.hasImage ? `<div class="export-row" style="margin-top:10px;"><button class="tb-btn${generationReferenceState.includeImage ? ' primary' : ''}" type="button" onclick="setIncludeReferenceImageForGeneration(true)">传给生图接口</button><button class="tb-btn${!generationReferenceState.includeImage ? ' primary' : ''}" type="button" onclick="setIncludeReferenceImageForGeneration(false)">本次不传图片</button></div>` : ''}
-    </div>`;
+    </div>` : '';
 
     const promptStepBody = state.promptReady
       ? `<textarea id="prompt-step-editor" class="plan-edit-textarea" style="min-height:320px;margin-top:10px;font-size:13px;line-height:1.8;" oninput="setFinalPrompt(this.value)">${escapeHtml(combinedPrompt || '')}</textarea>`
@@ -6565,7 +6565,9 @@ function renderPromptCard() {
     <div style="font-size:12px;color:var(--text-sub);line-height:1.7;margin-top:6px;">第二步：${escapeHtml(promptStatusText)}</div>
   </div>`;
 
-  wrap.innerHTML = `<div style="display:grid;gap:12px;">
+  wrap.innerHTML = state.promptReady
+    ? `<div style="display:grid;gap:12px;">${currentStepBlock}</div>`
+    : `<div style="display:grid;gap:12px;">
     ${statusCard}
     ${buildPromptStepNavigatorHtml()}
     ${currentStepBlock}
@@ -10618,12 +10620,10 @@ async function callAgentImageGenerate(prompt, imageUrl, options) {
   const promptRecordId = String(state.promptRecordId || '').trim();
   if (promptRecordId) {
     basePayload.promptRecordId = promptRecordId;
-  }
-  if (!promptRecordId) {
-    imageDebugState.phase = 'failed';
-    imageDebugState.finalError = '图片生成缺少 promptRecordId。create-task 新协议要求必须使用第一步返回的 id。';
-    writeImageGenerateDebug();
-    throw new Error('图片生成缺少 promptRecordId。请先重新执行第一步生成 config，并确认接口已返回 id。');
+  } else {
+    // promptRecordId 缺失时只记录警告，仍尝试发请求（某些后端不要求此字段）
+    imageDebugState.missingPromptRecordId = true;
+    console.warn('[image-create] promptRecordId 缺失，将尝试不带 id 的请求');
   }
 
   const createPayload = {
@@ -10684,12 +10684,36 @@ async function callAgentImageGenerate(prompt, imageUrl, options) {
     n: normalizedN,
   });
 
+  // 不含 promptRecordId 的极简兜底变体（排查后端是否因此字段崩溃）
+  const bareBaseFields = {
+    timestamp: basePayload.timestamp,
+    channel: basePayload.channel,
+    version: basePayload.version,
+    sign: basePayload.sign,
+    prompt: basePayload.prompt,
+    n: normalizedN,
+  };
+  const noIdCreatePayload = removeEmptyOptionalFields({
+    ...bareBaseFields,
+    image_url: basePayload.image_url,
+    size: opts.size || 'auto',
+    quality: opts.quality || 'medium',
+    output_format: opts.output_format || 'png',
+    n: normalizedN,
+  });
+  const noIdSlimPayload = removeEmptyOptionalFields({
+    ...bareBaseFields,
+    image_url: basePayload.image_url,
+  });
+
   const imageBase64 = String(opts.imageBase64 || '').trim();
   if (imageBase64) {
     createPayload.image_base64 = imageBase64;
     slimPayload.image_base64 = imageBase64;
     aliasPayload.image_base64 = imageBase64;
     aliasSlimPayload.image_base64 = imageBase64;
+    noIdCreatePayload.image_base64 = imageBase64;
+    noIdSlimPayload.image_base64 = imageBase64;
   }
 
   const endpointCandidates = [];
@@ -10778,8 +10802,8 @@ async function callAgentImageGenerate(prompt, imageUrl, options) {
   let createData = null;
   for (const endpoint of endpointCandidates) {
     const payloadCandidates = isTaskCreateEndpoint(endpoint)
-      ? [createPayload, slimPayload, aliasPayload, aliasSlimPayload]
-      : [directPayload, directSlimPayload];
+      ? [createPayload, slimPayload, aliasPayload, aliasSlimPayload, noIdCreatePayload, noIdSlimPayload]
+      : [directPayload, directSlimPayload, noIdCreatePayload, noIdSlimPayload];
     for (const bodyPayload of payloadCandidates) {
       const attemptRecord = {
         endpoint,
